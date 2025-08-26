@@ -1,0 +1,32 @@
+[
+    {
+        "keyMain" : "Department",
+        "title": "กรม",
+        "url": "/Department?page=1",
+        "logo": "Building2"
+    },
+    {
+        "keyMain" : "State",
+        "title": "เขตสุขภาพ",
+        "url": "/State?page=1",
+        "logo": "Grid2X2"
+    },
+    {
+        "keyMain" : "Office",
+        "title": "สำนักงานสาธารณสุขจังหวัด",
+        "url": "/Office?page=1",
+        "logo": "Bandage"
+    },
+    {
+        "keyMain" : "HCenter",
+        "title": "โรงพยาบาลศูนย์",
+        "url": "/HCenter?page=1",
+        "logo": "Hospital"
+    },
+    {
+        "keyMain" : "HGeneral",
+        "title": "โรงพยาบาลทั่วไป",
+        "url": "/HGeneral?page=1",
+        "logo": "Ambulance"
+    }
+]

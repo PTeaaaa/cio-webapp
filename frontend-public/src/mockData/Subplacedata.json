@@ -1,0 +1,44 @@
+{
+    "กรม": [
+        {
+            "keySub": "PublicHealth",
+            "mainType": "Department",
+            "title": "สำนักงานปลัดกระทรวงสาธารณสุข",
+            "YearContain": "2567, 2566, 2565"
+        },
+        {
+            "keySub": "MedicalService",
+            "mainType": "Department",
+            "title": "กรมการแพทย์",
+            "YearContain": "2565"
+        }
+    ],
+    "เขตสุขภาพ": [
+        {
+            "keySub": "HealthZone1",
+            "mainType": "State",
+            "title": "เขตสุขภาพที่ 1",
+            "YearContain": "2566"
+        },
+        {
+            "keySub": "HealthZone2",
+            "mainType": "State",
+            "title": "เขตสุขภาพที่ 2",
+            "YearContain": "2565"
+        }
+    ],
+    "สำนักงานสาธารณสุขจังหวัด": [
+        {
+            "keySub": "OfficePHPrajuab",
+            "mainType": "Office",
+            "title": "สำนักงานสาธารณสุขจังหวัดประจวบคีรีขันธ์",
+            "YearContain": "2566"
+        },
+        {
+            "keySub": "TestingOffice",
+            "mainType": "Office",
+            "title": "TestingOffice",
+            "YearContain": "2077, 1333"
+        }
+    ]
+}

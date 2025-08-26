@@ -1,0 +1,77 @@
+[
+    {
+        "numberOrder": 1,
+        "name": "สำนักงานปลัดกระทรวงสาธารณสุข",
+        "agency": "Department"
+    },
+    {
+        "numberOrder": 2,
+        "name": "กรมการแพทย์",
+        "agency": "Department"
+    },
+    {
+        "numberOrder": 3,
+        "name": "กรมการแพทย์แผนไทยและการแพทย์ทางเลือก",
+        "agency": "Department"
+    },
+    {
+        "numberOrder": 4,
+        "name": "กรมสุขภาพจิต",
+        "agency": "Department"
+    },
+    {
+        "numberOrder": 5,
+        "name": "กรมวิทยาศาสตร์การแพทย์",
+        "agency": "Department"
+    },
+    {
+        "numberOrder": 6,
+        "name": "กรมอนามัย",
+        "agency": "Department"
+    },
+    {
+        "numberOrder": 7,
+        "name": "กรมควบคุมโรค",
+        "agency": "Department"
+    },
+    {
+        "numberOrder": 8,
+        "name": "กรมสนับสนุนบริการสุขภาพ",
+        "agency": "Department"
+    },
+    {
+        "numberOrder": 9,
+        "name": "สถาบันพระบรมราชชนก",
+        "agency": "Department"
+    },
+    {
+        "numberOrder": 10,
+        "name": "สำนักงานคณะกรรมการอาหารและยา",
+        "agency": "Department"
+    },
+    {
+        "numberOrder": 11,
+        "name": "เขตสุขภาพที่ 1",
+        "agency": "State"
+    },
+    {
+        "numberOrder": 12,
+        "name": "เขตสุขภาพที่ 2",
+        "agency": "State"
+    },
+    {
+        "numberOrder": 13,
+        "name": "เขตสุขภาพที่ 3",
+        "agency": "State"
+    },
+    {
+        "numberOrder": 14,
+        "name": "เขตสุขภาพที่ 4",
+        "agency": "State"
+    },
+    {
+        "numberOrder": 15,
+        "name": "เขตสุขภาพที่ 5",
+        "agency": "State"
+    }
+]

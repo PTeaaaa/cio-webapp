@@ -1,0 +1,120 @@
+{
+    "DepartmentPeopleData": [
+        {   
+            "keyPerson" : "Surakmet67",
+            "honorific": "นายแพทย์",
+            "name": "สุรัคเมธ",
+            "surname": "มหาศิริมงคล",
+            "keySub": "PublicHealth",
+            "subTitle": "สำนักงานปลัดกระทรวงสาธารณสุข",
+            "fullSubTitle": "สำนักงานปลัดกระทรวงสาธารณสุข",
+            "email": "saraban0212@moph.go.th",
+            "phone": "02 590 1214",
+            "position": "ผู้อำนวยการศูนย์เทคโนโลยีสารสนเทศและการสื่อสาร",
+            "imageSrc": "/assets/surakmet.jpeg",
+            "year": "2567"
+        },
+        {
+            "keyPerson" : "Anan66",
+            "honorific": "นายแพทย์",
+            "name": "อนันต์",
+            "surname": "กนกศิลป์",
+            "keySub": "PublicHealth",
+            "subTitle": "สำนักงานปลัดกระทรวงสาธารณสุข",
+            "fullSubTitle": "สำนักงานปลัดกระทรวงสาธารณสุข",
+            "email": "saraban0212@moph.go.th",
+            "phone": "02 590 1214",
+            "position": "ผู้อำนวยการศูนย์เทคโนโลยีสารสนเทศและการสื่อสาร",
+            "imageSrc": "/assets/Anan.jpeg",
+            "year": "2566"
+        },
+        {   
+            "keyPerson" : "Anan65",
+            "honorific": "นายแพทย์",
+            "name": "อนันต์",
+            "surname": "กนกศิลป์",
+            "keySub": "PublicHealth",
+            "subTitle": "สำนักงานปลัดกระทรวงสาธารณสุข",
+            "fullSubTitle": "สำนักงานปลัดกระทรวงสาธารณสุข",
+            "email": "saraban0212@moph.go.th",
+            "phone": "02 590 1214",
+            "position": "ผู้อำนวยการศูนย์เทคโนโลยีสารสนเทศและการสื่อสาร",
+            "imageSrc": "/assets/Anan.jpeg",
+            "year": "2565"
+        },
+        {
+            "keyPerson" : "Nattapong65",
+            "honorific": "นายแพทย์",
+            "name": "ณัฐพงศ์",
+            "surname": "วงศ์วิวัฒน์",
+            "keySub": "MedicalService",
+            "subTitle": "กรมการแพทย์",
+            "fullSubTitle": "กรมการแพทย์",
+            "email": "ddgnut2018@gmail.com",
+            "phone": "02 591 8236",
+            "position": "รองอธิบดี กรมการแพทย์",
+            "imageSrc": "/assets/Nattapong.jpg",
+            "year": "2565"
+        }
+    ],
+    "StatePeopleData": [
+        {   
+            "keyPerson" : "Waranyu66",
+            "honorific": "นายแพทย์",
+            "name": "วรัญญู",
+            "surname": "จำนงประสาทพร",
+            "keySub": "HealthZone1",
+            "subTitle": "เขตสุขภาพที่ 1",
+            "fullSubTitle": "สำนักงานเขตสุขภาพที่ 1",
+            "email": "healthregion1@gmail.com",
+            "phone": "05 389 0238 , 05 389 0240",
+            "position": "นายแพทย์สาธารณสุขจังหวัดแม่ฮ่องสอน",
+            "imageSrc": "/assets/Waranyu.jpg",
+            "year": "2566"
+        },
+        {    
+            "keyPerson" : "Test",
+            "honorific": "นายแพทย์",
+            "name": "วรัญญู",
+            "surname": "จำนงประสาทพร",
+            "keySub": "HealthZone1",
+            "subTitle": "เขตสุขภาพที่ 1",
+            "fullSubTitle": "สำนักงานเขตสุขภาพที่ 1",
+            "email": "healthregion1@gmail.com",
+            "phone": "05 389 0238 , 05 389 0240",
+            "position": "นายแพทย์สาธารณสุขจังหวัดแม่ฮ่องสอน",
+            "imageSrc": "/assets/Waranyu.jpg",
+            "year": "2570"
+        },
+        {
+            "keyPerson" : "Kraisuk65",
+            "honorific": "นายแพทย์",
+            "name": "ไกรสุข",
+            "surname": "เพชระบูรณิน",
+            "keySub": "HealthZone2",
+            "subTitle": "เขตสุขภาพที่ 2",
+            "fullSubTitle": "สำนักงานเขตสุขภาพที่ 2",
+            "email": "rh2.cio13@gmail.com",
+            "phone": "05 524 8658",
+            "position": "นายแพทย์สาธารณสุขจังหวัดพิษณุโลก",
+            "imageSrc": "/assets/Kraisuk.jpg",
+            "year": "2565"
+        }
+    ],
+    "OfficePeopleData": [
+        {
+            "keyPerson" : "Jarurat66", 
+            "honorific": "นาง",
+            "name": "จารุรัตน์",
+            "surname": "พัฒน์ทอง",
+            "keySub": "OfficePHPrajuab",
+            "subTitle": "สำนักงานสาธารณสุขจังหวัดประจวบคีรีขันธ์",
+            "fullSubTitle": "สำนักงานสาธารณสุขจังหวัดประจวบคีรีขันธ์",
+            "email": "worawit.saes@mophegp.mail.go.th",
+            "phone": "03-261-1053",
+            "position": "เภสัชกรชำนาญการพิเศษ (ด้านเภสัชสาธารณสุข) รักษาการในตำแหน่งนักวิชาการสาธารณสุขเชี่ยวชาญ (ด้านส่งเสริมพัฒนา)",
+            "imageSrc": "/assets/Jarurat.jpg",
+            "year": "2566"
+        }
+    ]
+}

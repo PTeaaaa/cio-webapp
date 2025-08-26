@@ -1,0 +1,20 @@
+{
+  "name": "cioadminsite",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "concurrently -n \"FRONT-PUBLIC,FRONT-ADMIN,BACK\" -c \"bgGreen.bold,bgBlue.bold,bgMagenta.bold\" \"npm run dev --prefix frontend-public\" \"npm run dev --prefix frontend-admin\" \"npm run start:dev --prefix backend\"",
+    "dev:next:public": "npm run dev --prefix frontend-public",
+    "dev:next:admin": "npm run dev --prefix frontend-admin",
+    "dev:nest": "npm run start:dev --prefix backend"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "concurrently": "^9.2.0"
+  }
+}

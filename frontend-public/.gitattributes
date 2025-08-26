@@ -1,0 +1,28 @@
+# Enforce consistent line endings across all systems
+* text=auto
+
+# Explicitly set text files to LF (Unix-style)
+*.js   text eol=lf
+*.ts   text eol=lf
+*.tsx  text eol=lf
+*.jsx  text eol=lf
+*.json text eol=lf
+*.css  text eol=lf
+*.html text eol=lf
+*.md   text eol=lf
+
+# Binary files - don't modify line endings
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.svg  binary
+*.ico  binary
+*.pdf  binary
+*.mp4  binary
+*.mp3  binary
+*.zip  binary
+
+# Optional: treat lockfiles as text, but keep consistent
+package-lock.json text eol=lf
+yarn.lock        text eol=lf

@@ -1,0 +1,14 @@
+# Build and distribution files
+.dist/
+dist/
+
+# IDE files
+.idea/
+.vscode/
+.kiro/
+
+# Node.js dependencies
+node_modules/
+
+# Miscellaneous
+photoExample/

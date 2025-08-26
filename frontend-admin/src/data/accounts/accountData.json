@@ -1,0 +1,30 @@
+[
+  {
+    "id": "user-admin-1",
+    "username": "admin",
+    "password": "password123",
+    "role": "admin",
+    "assigned_place_id": null
+  },
+  {
+    "id": "user-place-A",
+    "username": "hospital_A_user",
+    "password": "password456",
+    "role": "place_user",
+    "assigned_place_id": "place-A"
+  },
+  {
+    "id": "user-place-B",
+    "username": "clinic_B_user",
+    "password": "password789",
+    "role": "place_user",
+    "assigned_place_id": "place-B"
+  },
+  {
+    "id": "user-no-access",
+    "username": "guest",
+    "password": "guestpass",
+    "role": "guest",
+    "assigned_place_id": null
+  }
+]

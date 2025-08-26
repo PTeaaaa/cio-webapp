@@ -1,0 +1,19 @@
+{
+    "navItems": [
+        {
+            "icon": "House",
+            "name": "Home",
+            "path": "/"
+        },
+        {
+            "icon": "MapPinHouse",
+            "name": "สถานที่ของคุณ",
+            "subItems": []
+        },
+        {
+            "icon": "UserRoundPlus",
+            "name": "เพิ่มบัญชีผู้ใช้",
+            "path": "/profile"
+        }
+    ]
+}

@@ -1,0 +1,93 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Account {
+  id                String      @id @default(uuid())
+  username          String      @unique
+  password          String
+  role              String
+
+  sessionId         String?     @unique
+  sessionExpiredAt  DateTime?
+  sessionRevokedAt  DateTime?
+
+  sessionUaHash     String?
+  sessionIp         String?
+
+  // Security tracking
+  lastLoginAt       DateTime?
+  loginAttemped     Int?
+  lockedUntil       DateTime?
+  passwordChangedAt DateTime?
+  
+  // Audit trail
+  createdBy         String?
+  modifiedBy        String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  assignedPlaces    AccountPlace[]
+
+  @@map("accounts")
+}
+
+model Place {
+  id                String  @id @default(uuid())
+  name              String  @unique
+  agency            String
+  numberOrder       Int     @default(0)
+
+  people            PersonPlacement[]
+  assignedAccounts  AccountPlace[]
+
+  @@map("places")
+}
+
+model AccountPlace {
+  id          Int     @id @default(autoincrement())
+  account     Account @relation(fields: [accountId], references: [id])
+  accountId   String
+  place       Place   @relation(fields: [placeId], references: [id])
+  placeId     String
+
+  @@unique([accountId,placeId])
+  @@map("account_place")
+}
+
+model Person {
+  id          String   @id @default(uuid())
+  prefix      String?
+  name        String
+  surname     String
+  email       String?
+  phone       String?
+  position    String?
+  imageUrl    String?
+  placeId     String?
+  department  String
+  year        Int
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  placements  PersonPlacement[]
+
+  @@unique([name, surname, year])
+  @@map("people")
+}
+
+model PersonPlacement {
+  id          Int     @id @default(autoincrement())
+  person      Person  @relation(fields: [personId], references: [id])
+  personId    String
+  place       Place   @relation(fields: [placeId], references: [id])
+  placeId     String
+
+  @@unique([personId,placeId])
+  @@map("person_placements")
+}

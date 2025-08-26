@@ -1,0 +1,48 @@
+services:
+  # This defines our PostgreSQL database service
+  postgres_db:
+    # We will use the official PostgreSQL image, version 15
+    image: postgres:15
+
+    # A friendly name for the container so it's easy to identify
+    container_name: cio_project_db
+
+    # This ensures the database will always restart automatically if it crashes or the system reboots
+    restart: always
+
+    # Environment variables to configure the database instance
+    environment:
+      POSTGRES_USER: AdminNewbie
+      POSTGRES_PASSWORD: verysecurepassword  # You should change this to a secure password
+      POSTGRES_DB: postgres             # The name of the database to be created
+
+    # This maps the port from inside the container (right side) to your local machine (left side)
+    # It makes the database accessible at localhost:5432
+    ports:
+      - "5432:5432"
+
+    # This creates a persistent storage volume for the database data.
+    # It ensures that even if you remove the container, your data will not be lost.
+    volumes:
+      - cio_postgres_data:/var/lib/postgresql/data
+  
+  minio: # บริการสำหรับ MinIO
+    image: minio/minio:latest # ใช้ Image ของ MinIO
+    container_name: cio_minio
+    restart: unless-stopped # รันอัตโนมัติ
+    
+    environment:
+      MINIO_ROOT_USER: minioadmin # Username สำหรับ MinIO
+      MINIO_ROOT_PASSWORD: minioadminpassword # Password สำหรับ MinIO
+      # สามารถเพิ่ม MINIO_DEFAULT_BUCKETS ถ้าต้องการสร้าง Bucket ตั้งต้น
+    volumes:
+      - minio_data:/data # Volume สำหรับเก็บข้อมูลของ MinIO
+    ports:
+      - "9000:9000" # MinIO API port
+      - "9001:9001" # MinIO Console port (ถ้า MinIO version นั้นมี)
+    command: server --console-address ":9001" /data # คำสั่งสำหรับรัน MinIO server
+
+# This section defines the named volume we used above
+volumes:
+  cio_postgres_data:
+  minio_data:

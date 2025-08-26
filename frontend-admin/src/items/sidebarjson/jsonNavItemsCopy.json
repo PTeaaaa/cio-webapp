@@ -1,0 +1,174 @@
+{
+    "navItems": [
+        {
+            "icon": "House",
+            "name": "Home",
+            "path": "/"
+        },
+        {
+            "icon": "MapPinHouse",
+            "name": "สถานที่ของคุณ",
+            "subItems": [
+            ]
+        },
+        {
+            "icon": "Pencil",
+            "name": "Testing",
+            "subItems": [
+                {
+                    "name": "ข้อมูลของคุณ Mock",
+                    "path": "/mockListPeople"
+                },
+                {
+                    "name": "แก้ไขข้อมูล Mock",
+                    "path": "/mockupshowEdit"
+                },
+                {
+                    "name": "เพิ่มข้อมูลใหม่",
+                    "path": "/addnew"
+                },
+                {
+                    "name": "ข้อมูลของคุณ",
+                    "path": "/listpeople/a047900b-a8dd-462e-b815-55152883e1a6"
+                },
+                {
+                    "name": "แก้ไขข้อมูล",
+                    "path": "/edit"
+                }
+            ]
+        },
+        {
+            "icon": "DoorClosed",
+            "name": "Signing things",
+            "subItems": [
+                {
+                    "name": "Sign In",
+                    "path": "/signin"
+                },
+                {
+                    "name": "Sign Up",
+                    "path": "/signup",
+                    "new": true
+                }
+            ]
+        },
+        {
+            "icon": "CalenderIcon",
+            "name": "Calendar",
+            "path": "/calendar"
+        },
+        {
+            "icon": "UserCircleIcon",
+            "name": "User Profile",
+            "path": "/profile"
+        },
+        {
+            "name": "Forms",
+            "icon": "ListIcon",
+            "subItems": [
+                {
+                    "name": "Form Elements",
+                    "path": "/form-elements",
+                    "pro": false
+                }
+            ]
+        },
+        {
+            "name": "Tables",
+            "icon": "TableIcon",
+            "subItems": [
+                {
+                    "name": "Basic Tables",
+                    "path": "/basic-tables",
+                    "pro": false
+                }
+            ]
+        },
+        {
+            "name": "Pages",
+            "icon": "PageIcon",
+            "subItems": [
+                {
+                    "name": "Blank Page",
+                    "path": "/blank",
+                    "pro": false
+                },
+                {
+                    "name": "404 Error",
+                    "path": "/error-404",
+                    "pro": false
+                }
+            ]
+        }
+    ],
+    "othersItems": [
+        {
+            "icon": "PieChartIcon",
+            "name": "Charts",
+            "subItems": [
+                {
+                    "name": "Line Chart",
+                    "path": "/line-chart",
+                    "pro": false
+                },
+                {
+                    "name": "Bar Chart",
+                    "path": "/bar-chart",
+                    "pro": false
+                }
+            ]
+        },
+        {
+            "icon": "BoxCubeIcon",
+            "name": "UI Elements",
+            "subItems": [
+                {
+                    "name": "Alerts",
+                    "path": "/alerts",
+                    "pro": false
+                },
+                {
+                    "name": "Avatar",
+                    "path": "/avatars",
+                    "pro": false
+                },
+                {
+                    "name": "Badge",
+                    "path": "/badge",
+                    "pro": false
+                },
+                {
+                    "name": "Buttons",
+                    "path": "/buttons",
+                    "pro": false
+                },
+                {
+                    "name": "Images",
+                    "path": "/images",
+                    "pro": false
+                },
+                {
+                    "name": "Videos",
+                    "path": "/videos",
+                    "pro": false
+                }
+            ]
+        },
+        {
+            "icon": "PlugInIcon",
+            "name": "Authentication",
+            "subItems": [
+                {
+                    "name": "Sign In",
+                    "path": "/signin",
+                    "pro": false
+                },
+                {
+                    "name": "Sign Up",
+                    "path": "/signup",
+                    "pro": false
+                }
+            ]
+        }
+    ]
+}
