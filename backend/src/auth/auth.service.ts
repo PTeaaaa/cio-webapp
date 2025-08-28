@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, ConflictException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { ConfigService } from '@nestjs/config';
 import { randomBytes } from 'crypto';
@@ -19,19 +19,46 @@ export class AuthService {
         private readonly configService: ConfigService,
     ) { }
 
-    // Signup method, Just for demonstration purposes
-    async signup(username: string, pass: string, role: string) {
-        const hashedPassword = await bcrypt.hash(pass, 12);
-        const account = await this.prisma.account.create({
-            data: {
-                username,
-                password: hashedPassword,
-                role,
-            },
+    // Enhanced signup method with validation and error handling
+    async signup(username: string, password: string, role: string) {
+        // Validate input
+        if (!username || username.trim().length < 3) {
+            throw new BadRequestException('Username must be at least 3 characters long');
+        }
+
+        if (!password || password.length < 6) {
+            throw new BadRequestException('Password must be at least 6 characters long');
+        }
+
+        if (!['admin', 'user', 'moderator'].includes(role)) {
+            throw new BadRequestException('Invalid role. Must be admin, user, or moderator');
+        }
+
+        // Check if username already exists
+        const existingAccount = await this.prisma.account.findUnique({
+            where: { username: username.trim() },
         });
-        // We don't return the password hash
-        const { password, ...result } = account;
-        return result;
+
+        if (existingAccount) {
+            throw new ConflictException('Username already exists');
+        }
+
+        try {
+            const hashedPassword = await bcrypt.hash(password, 12);
+            const account = await this.prisma.account.create({
+                data: {
+                    username: username.trim(),
+                    password: hashedPassword,
+                    role,
+                },
+            });
+
+            // Return user without password
+            const { password: _, ...result } = account;
+            return result;
+        } catch (error) {
+            throw new BadRequestException('Failed to create account');
+        }
     }
 
     async login(username: string, password: string, res: Response) {

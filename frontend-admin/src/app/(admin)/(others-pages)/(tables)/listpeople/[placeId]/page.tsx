@@ -7,7 +7,7 @@ import ListPeopleTable from "@/components-my/tables/ListPeopleTable";
 import React from "react";
 import { Plus } from "lucide-react";
 import { PeopleProvider } from "@/contexts/PeopleContext";
-import { getPlaceById } from "@/services/placesAPI/placesAPI";
+import { getPlaceById } from "@/services/places/placesAPI";
 import { Place } from "@/types";
 
 export default function ListPeople({ params }: { params: Promise<{ placeId: string }> }) {

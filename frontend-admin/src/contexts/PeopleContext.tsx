@@ -6,7 +6,7 @@ import {
   createPerson as apiCreatePerson,
   updatePerson as apiUpdatePerson,
   deletePerson as apiDeletePerson
-} from '@/services/peopleAPI/peopleAPI';
+} from '@/services/people/peopleAPI';
 import { Person, PersonForm, CreatePersonPayload, UpdatePersonPayload } from '@/types'; // นำเข้า Person และ Payload types
 
 interface PeopleContextType {
@@ -23,13 +23,18 @@ interface PeopleContextType {
 
 const PeopleContext = createContext<PeopleContextType | undefined>(undefined);
 
-export function PeopleProvider({ children, initialPlaceId, initialPersonId }: { children: ReactNode, initialPlaceId?: string, initialPersonId?: string }) {
+export function PeopleProvider({ 
+  children,
+  initialPlaceId,
+}: { 
+  children: ReactNode,
+  initialPlaceId?: string,
+}) {
+
   const [people, setPeople] = useState<Person[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [placeId, setPlaceId] = useState<string | null>(initialPlaceId || null);
-  const [onePerson, setOnePerson] = useState<PersonForm[]>([]);
-  const [personId] = useState<string | null>(initialPersonId || null);
 
   // --- fetch People for list table ---
   const fetchPeople = async (placeId: string) => {

@@ -1,4 +1,4 @@
-import { Get, Post, Body, Controller, HttpCode, HttpStatus, Req, Res, UnauthorizedException } from '@nestjs/common';
+import { Get, Post, Body, Controller, HttpCode, HttpStatus, Req, Res, UnauthorizedException, ValidationPipe } from '@nestjs/common';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto/auth.dto';
@@ -6,6 +6,7 @@ import { Request } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '@/prisma/prisma.service';
 import { getSessionCookieOpts } from './session/session-cookie';
+import { SignupDto } from './dto/signup.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -35,8 +36,15 @@ export class AuthController {
     }
 
     @Post('signup')
-    async signup(@Body() authDto: AuthDto) {
-        return this.authService.signup(authDto.username, authDto.password, 'user');
+    @HttpCode(HttpStatus.CREATED)
+    async signup(@Body(ValidationPipe) signupDto: SignupDto) {
+        const { username, password, role } = signupDto;
+        const user = await this.authService.signup(username, password, role);
+
+        return {
+            message: 'Account created successfully',
+            user,
+        };
     }
 
     @Get('session')

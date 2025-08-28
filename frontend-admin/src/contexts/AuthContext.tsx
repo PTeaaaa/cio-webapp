@@ -14,13 +14,15 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
 export const useAuth = () => {
-    const ctx = useContext(AuthContext);
-    if (!ctx) throw new Error('useAuth must be used within AuthProvider');
-    return ctx;
+    const context = useContext(AuthContext);
+    if (!context) throw new Error('useAuth must be used within AuthProvider');
+    return context;
 };
 
 export function AuthProvider({ initialUser, children }: { initialUser: User | null; children: React.ReactNode }) {
+    
     const [user, setUser] = useState<User | null>(initialUser);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isLoggingOut, setIsLoggingOut] = useState<boolean>(false); // Add this state
@@ -48,8 +50,8 @@ export function AuthProvider({ initialUser, children }: { initialUser: User | nu
             
             setIsLoading(true);
             try {
-                const u = await getSession();
-                if (!ignore) setUser(u);
+                const sessionToken = await getSession();
+                if (!ignore) setUser(sessionToken);
             } catch {
                 // If session check fails, make sure user is null
                 if (!ignore) setUser(null);
@@ -105,5 +107,6 @@ export function AuthProvider({ initialUser, children }: { initialUser: User | nu
     };
 
     const value = useMemo(() => ({ user, isLoading, isLoggingOut, login, logout }), [user, isLoading, isLoggingOut]);
+    
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

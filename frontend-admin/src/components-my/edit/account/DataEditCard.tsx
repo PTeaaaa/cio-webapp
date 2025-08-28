@@ -1,13 +1,14 @@
 // ไฟล์: InfoEditCard.tsx
 import React from "react";
-import { Modal } from "../../components/ui/modal";
-import { ConfirmationCard } from "../../components/ui/modal/ConfirmationCard";
-import Button from "../../components/ui/button/Button";
-import Input from "../../components/form/input/InputField";
-import Label from "../../components/form/Label";
+import { Modal } from "../../../components/ui/modal";
+import { ConfirmationCard } from "../../../components/ui/modal/ConfirmationCard";
+import Button from "../../../components/ui/button/Button";
+import Input from "../../../components/form/input/InputField";
+import Label from "../../../components/form/Label";
 import { useEditInfoCard } from "@/hooks/infoCardHook/useEditInfoCard";
+import { useAccounts } from "@/contexts/AccountsContext";
 
-export default function InfoEditCard() {
+export default function DataEditCard() {
     const {
         isOpen,
         openModal,
@@ -22,6 +23,8 @@ export default function InfoEditCard() {
         showConfirmDialog,
         loading,
     } = useEditInfoCard();
+
+    const { accountsLoading } = useAccounts();
 
     const handleFormSubmit = (event: React.FormEvent) => {
         // This line is the key: it stops the browser from reloading the page.

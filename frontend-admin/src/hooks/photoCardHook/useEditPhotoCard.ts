@@ -5,8 +5,8 @@ import { useModal } from "@/hooks/useModal";
 // import { usePeople } from "@/context/PeopleContext"; // ไม่จำเป็นต้องใช้ updatePerson จาก usePeople แล้ว
 import { useSearchParams } from "next/navigation";
 import { useDropzone } from "react-dropzone";
-import { uploadPersonImage } from "@/services/uploadAPI/uploadAPI"; // นำเข้าฟังก์ชันอัปโหลดรูปภาพ
-import { getPersonByPersonId } from "@/services/peopleAPI/peopleAPI"; // นำเข้าฟังก์ชันดึงข้อมูลบุคคล
+import { uploadPersonImage } from "@/services/upload/uploadAPI"; // นำเข้าฟังก์ชันอัปโหลดรูปภาพ
+import { getPersonByPersonId } from "@/services/people/peopleAPI"; // นำเข้าฟังก์ชันดึงข้อมูลบุคคล
 
 type ModalStatus = 'preview' | 'uploading' | 'success' | 'error';
 

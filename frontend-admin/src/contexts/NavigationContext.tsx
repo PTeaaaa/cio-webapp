@@ -3,7 +3,7 @@
 "use client";
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { getSidebarItems } from "@/services/sidebar/sidebarAPI";
+import { getSidebarItems } from "@/services/sidebars/sidebarAPI";
 import jsonNavItems from "@/items/sidebarjson/jsonNavItems.json";
 
 interface NavItem {

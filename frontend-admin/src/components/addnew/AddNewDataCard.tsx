@@ -8,10 +8,10 @@ import Button from "../ui/button/Button";
 import Input from "../form/input/InputField";
 import Label from "../form/Label";
 import ComponentCard from '@/components/common/ComponentCard';
-import { getSidebarItems } from "@/services/sidebar/sidebarAPI";
-import { createPerson } from "@/services/peopleAPI/peopleAPI";
+import { getSidebarItems } from "@/services/sidebars/sidebarAPI";
+import { createPerson } from "@/services/people/peopleAPI";
 import { CreatePersonPayload, PersonForm, Place } from "@/types";
-import { uploadPersonImage } from "@/services/uploadAPI/uploadAPI"; // นำเข้าฟังก์ชันอัปโหลดรูปภาพ
+import { uploadPersonImage } from "@/services/upload/uploadAPI"; // นำเข้าฟังก์ชันอัปโหลดรูปภาพ
 
 export default function AddNewDataCard() {
     const router = useRouter();

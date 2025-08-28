@@ -48,3 +48,16 @@ export type QueueItem = {
     resolve: (value: Response) => void;
     reject: (reason: any) => void;
 };
+
+export interface AccountForm {
+    id: string;
+    username: string;
+    role: string;
+    lastLoginAt: Date;
+    passwordChangedAt?: Date;
+    createdBy: string;
+    createdAt: Date;
+    modifiedBy: string;
+    updatedAt: Date;
+    isActive: boolean;
+}

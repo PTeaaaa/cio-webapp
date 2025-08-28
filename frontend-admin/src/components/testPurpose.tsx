@@ -2,7 +2,7 @@
 
 "use client";
 
-import { getSidebarItems } from "@/services/sidebar/sidebarAPI"; // Adjust the import path if needed
+import { getSidebarItems } from "@/services/sidebars/sidebarAPI"; // Adjust the import path if needed
 
 const TestFetchButton = () => {
   const handleTestFetch = async () => {

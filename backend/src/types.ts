@@ -22,3 +22,15 @@ export interface PlaceForm {
 export type PersonPlacementSeeding = Pick<PersonForm, 'id' | 'name' | 'surname' | 'department' | 'year'>
 
 export type PersonFormSeeding = Omit<PersonForm, 'imageUrl' | 'placeId'>;
+
+export interface AccountForm {
+    id: string;
+    username: string;
+    role: string;
+    lastLoginAt: Date;
+    passwordChangedAt?: Date;
+    createdBy: string;
+    createdAt: Date;
+    modifiedBy: string;
+    updatedAt: Date;
+}

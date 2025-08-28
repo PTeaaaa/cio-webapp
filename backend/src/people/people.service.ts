@@ -85,7 +85,7 @@ export class PeopleService {
         return person;
     }
 
-    async createPerson(user: SessionUser, createPersonDto: CreatePersonDto) {
+    async createPerson( createPersonDto: CreatePersonDto) {
 
         try {
             const { placeId, ...personData } = createPersonDto;

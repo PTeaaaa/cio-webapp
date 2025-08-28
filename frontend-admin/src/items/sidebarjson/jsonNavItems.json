@@ -13,7 +13,7 @@
         {
             "icon": "UserRoundPlus",
             "name": "เพิ่มบัญชีผู้ใช้",
-            "path": "/profile"
+            "path": "/listaccounts"
         }
     ]
 }

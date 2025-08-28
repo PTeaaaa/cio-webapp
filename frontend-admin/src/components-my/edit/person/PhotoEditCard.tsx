@@ -1,8 +1,8 @@
 "use client";
 import React from "react";
 import ComponentCard from "@/components/common/ComponentCard";
-import { Modal } from "../../components/ui/modal";
-import Button from "../../components/ui/button/Button";
+import { Modal } from "../../../components/ui/modal";
+import Button from "../../../components/ui/button/Button";
 import { useEditPhotoCard } from "@/hooks/photoCardHook/useEditPhotoCard"; // นำเข้า useEditPhotoCard hook
 import Image from "next/image";
 

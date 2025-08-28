@@ -11,6 +11,7 @@ import { PlacesModule } from './places/places.module';
 import { MinioModule } from './minio/minio.module';
 import { UploadService } from './upload/upload.service';
 import { UploadModule } from './upload/upload.module';
+import { AccountsModule } from './accounts/accounts.module';
 import * as Joi from 'joi';
 
 @Module({
@@ -45,6 +46,7 @@ import * as Joi from 'joi';
     PlacesModule,
     MinioModule,
     UploadModule,
+    AccountsModule,
   ],
   controllers: [AppController],
   providers: [AppService, UploadService],

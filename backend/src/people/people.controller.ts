@@ -21,10 +21,9 @@ export class PeopleController {
     @UseGuards(SessionGuard, RolesGuard)
     @Roles(Role.Admin, Role.User)
     createPerson(
-        @Req() req: RequestWithuser,
         @Body(new ValidationPipe()) createPersonDto: CreatePersonDto,
     ) {
-        return this.peopleService.createPerson(req.user, createPersonDto);
+        return this.peopleService.createPerson(createPersonDto);
     }
 
     @Get('getpeoplebyplaceId/:placeId')

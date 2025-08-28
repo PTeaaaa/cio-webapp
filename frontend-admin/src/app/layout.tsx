@@ -3,7 +3,6 @@ import { GeistMono } from "geist/font/mono";
 import './globals.css';
 import { SidebarProvider } from '@/contexts/SidebarContext';
 import { ThemeProvider } from '@/contexts/ThemeContext';
-import { PeopleProvider } from '@/contexts/PeopleContext';
 import { NavigationProvider } from '@/contexts/NavigationContext';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { getServerSessionUser } from '@/lib/serverSession';
@@ -37,13 +36,11 @@ export default async function RootLayout({
       <body className={`${outfit.variable} ${prompt.variable} ${geistMono.variable} dark:bg-gray-900`}>
         <ThemeProvider>
           <SidebarProvider>
-            <PeopleProvider>
-              <AuthProvider initialUser={initialUser} >
-                <NavigationProvider>
-                  {children}
-                </NavigationProvider>
-              </AuthProvider>
-            </PeopleProvider>
+            <AuthProvider initialUser={initialUser} >
+              <NavigationProvider>
+                {children}
+              </NavigationProvider>
+            </AuthProvider>
           </SidebarProvider>
         </ThemeProvider>
       </body>
