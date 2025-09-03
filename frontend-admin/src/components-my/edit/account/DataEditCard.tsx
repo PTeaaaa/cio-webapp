@@ -5,7 +5,7 @@ import { ConfirmationCard } from "../../../components/ui/modal/ConfirmationCard"
 import Button from "../../../components/ui/button/Button";
 import Input from "../../../components/form/input/InputField";
 import Label from "../../../components/form/Label";
-import { useEditInfoCard } from "@/hooks/infoCardHook/useEditInfoCard";
+import { useAccountData } from "@/hooks/accountdataHook/useAccountData";
 import { useAccounts } from "@/contexts/AccountsContext";
 
 export default function DataEditCard() {
@@ -22,7 +22,7 @@ export default function DataEditCard() {
         handleSave,
         showConfirmDialog,
         loading,
-    } = useEditInfoCard();
+    } = useAccountData();
 
     const { accountsLoading } = useAccounts();
 
@@ -31,7 +31,7 @@ export default function DataEditCard() {
         event.preventDefault();
     };
 
-    if (loading || !originalData) {
+    if (accountsLoading) {
         return (
             <div className="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6">
                 <div className="text-center py-8">
@@ -46,59 +46,111 @@ export default function DataEditCard() {
             <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
                 <div>
                     <h4 className="text-base font-semibold text-gray-800 dark:text-white/90 lg:mb-6">
-                        ข้อมูลส่วนตัว
+                        ข้อมูลบัญชี
                     </h4>
 
-                    <div className="grid grid-cols-2 pt-4 gap-3 xl:grid-cols-3 lg:gap-10 lg:gap-x-40">
+                    <div className="grid grid-cols-1 pt-4 gap-3 lg:gap-10 lg:gap-x-40">
                         {/* ส่วนแสดงข้อมูล */}
+
                         <div>
                             <p className="mb-1 text-sm leading-normal text-gray-500 dark:text-gray-400">
-                                คำนำหน้า
+                                ID
                             </p>
                             <p className="text-base font-medium text-gray-800 dark:text-white/90">
-                                {originalData.prefix}
+                                xxxx-xxxxx-xxxxx-xxxxx-xxxxx-xxxxx
+                            </p>
+                        </div>
+
+                        <div>
+                            <p className="mb-1 text-sm leading-normal text-gray-500 dark:text-gray-400">
+                                Username
+                            </p>
+                            <p className="text-base font-medium text-gray-800 dark:text-white/90">
+                                นาย
                             </p>
                         </div>
                         <div>
                             <p className="mb-1 text-sm leading-normal text-gray-500 dark:text-gray-400">
-                                ชื่อ
+                                ประเภทของบัญชี <span className="text-green-500">{" *"}</span>
                             </p>
                             <p className="text-base font-medium text-gray-800 dark:text-white/90">
-                                {originalData.name}
+                                TEST
                             </p>
                         </div>
                         <div>
                             <p className="mb-1 text-sm leading-normal text-gray-500 dark:text-gray-400">
-                                นามสกุล
+                                สถานะของบัญชี
                             </p>
                             <p className="text-base font-medium text-gray-800 dark:text-white/90">
-                                {originalData.surname}
+                                TEST
                             </p>
                         </div>
                         <div>
                             <p className="mb-1 text-sm leading-normal text-gray-500 dark:text-gray-400">
-                                อีเมล
+                                สถานที่ที่ได้รับมอบหมาย
                             </p>
                             <p className="text-base font-medium text-gray-800 dark:text-white/90 break-words" style={{ whiteSpace: "nowrap" }}>
-                                {originalData.email}
+                                TEST
                             </p>
                         </div>
                         <div>
                             <p className="mb-1 text-sm leading-normal text-gray-500 dark:text-gray-400">
-                                เบอร์โทรศัพท์
+                                เวลาที่ล็อกอินล่าสุด
                             </p>
                             <p className="text-base font-medium text-gray-800 dark:text-white/90">
-                                {originalData.phone}
+                                XX:XX
                             </p>
                         </div>
-                        <div>
-                            <p className="mb-1 text-sm leading-normal text-gray-500 dark:text-gray-400">
-                                ตำแหน่งตามหน่วยงานที่สังกัด
-                            </p>
-                            <p className="text-base font-medium text-gray-800 dark:text-white/90">
-                                {originalData.position}
-                            </p>
+
+                        <div className="grid grid-cols-2 gap-21">
+                            <div>
+                                <p className="mb-1 text-sm leading-normal text-gray-500 dark:text-gray-400">
+                                    สร้างเมื่อ
+                                </p>
+                                <p className="text-base font-medium text-gray-800 dark:text-white/90">
+                                    XX:XX
+                                </p>
+                            </div>
+
+                            <div>
+                                <p className="mb-1 text-sm leading-normal text-gray-500 dark:text-gray-400">
+                                    สร้างโดย
+                                </p>
+                                <p className="text-base font-medium text-gray-800 dark:text-white/90">
+                                    TEST
+                                </p>
+                            </div>
                         </div>
+
+                        <div className="grid grid-cols-2 gap-21">
+                            <div>
+                                <p className="mb-1 text-sm leading-normal text-gray-500 dark:text-gray-400">
+                                    เปลี่ยนแปลงล่าสุดเมื่อ
+                                </p>
+                                <p className="text-base font-medium text-gray-800 dark:text-white/90">
+                                    XX:XX
+                                </p>
+                            </div>
+
+                            <div>
+                                <p className="mb-1 text-sm leading-normal text-gray-500 dark:text-gray-400">
+                                    เปลี่ยนแปลงล่าสุดโดย
+                                </p>
+                                <p className="text-base font-medium text-gray-800 dark:text-white/90">
+                                    TEST
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="mt-4">
+                            <button
+                                className="flex w-full items-center justify-center gap-2 rounded-full border border-green-600 px-4 py-3 text-sm font-medium text-black shadow-theme-xs hover:bg-green-600 dark:border-green-700 dark:text-white dark:hover:bg-green-700 dark:hover:text-gray-200 lg:inline-flex lg:w-auto duration-200 ease-in-out"
+                                onClick={() => {}}
+                            >
+                                เปลี่ยนรหัสผ่านของบัญชีนี้
+                            </button>
+                        </div>
+
                     </div>
                 </div>
 

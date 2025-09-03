@@ -11,6 +11,18 @@ interface ApiResponse {
     };
 }
 
+export interface SignupPayload {
+    username: string;
+    password: string;
+    role: string;
+    assignPlace: string[];
+}
+
+export interface SignupResponse {
+    message: string;
+    user: AccountForm;
+}
+
 export const getAllAccounts = async (): Promise<AccountForm[] | null> => {
     try {
         const response = await apiFetch(`/accounts/get-allaccounts`);
@@ -26,5 +38,29 @@ export const getAllAccounts = async (): Promise<AccountForm[] | null> => {
     } catch (error) {
         console.error("Error in getAllAccounts:", error);
         return null;
+    }
+};
+
+export const createAccount = async (signupData: SignupPayload): Promise<SignupResponse | null> => {
+    try {
+        const response = await apiFetch('/auth/signup', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(signupData),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || `Failed to create account. Status: ${response.status}`);
+        }
+
+        const result: SignupResponse = await response.json();
+        return result;
+
+    } catch (error) {
+        console.error("Error in createAccount:", error);
+        throw error;
     }
 };

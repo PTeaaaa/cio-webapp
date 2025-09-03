@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  binaryTarget = ["native", "debian-openssl-3.0.x"]
 }
 
 datasource db {
@@ -17,6 +18,8 @@ model Account {
   sessionId         String?     @unique
   sessionExpiredAt  DateTime?
   sessionRevokedAt  DateTime?
+  refreshToken      String?     @unique
+  refreshTokenExpiresAt DateTime?
 
   // Security tracking
   lastLoginAt       DateTime?

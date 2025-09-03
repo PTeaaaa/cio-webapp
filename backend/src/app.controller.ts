@@ -1,6 +1,6 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
 import { AppService } from './app.service';
-import { SessionGuard } from './auth/guards/session.guard';
+import { JwtGuard } from './auth/guards/jwt.guard';
 import { RolesGuard } from './auth/guards/roles.guard';
 import { Roles } from './auth/decorators/roles.decorator';
 import { Role } from './auth/enums/roles.enum';
@@ -16,7 +16,7 @@ export class AppController {
   }
 
   @Get('admin')
-  @UseGuards(SessionGuard, RolesGuard)
+  @UseGuards(JwtGuard, RolesGuard)
   @Roles(Role.Admin)
   getAdminData() {
     return { message: 'Welcome, Admin! You can see this secret data.' };

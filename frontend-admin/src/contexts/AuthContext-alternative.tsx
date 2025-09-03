@@ -25,7 +25,7 @@ export function AuthProvider({ initialUser, children }: { initialUser: User | nu
     
     const [user, setUser] = useState<User | null>(initialUser);
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [isLoggingOut, setIsLoggingOut] = useState<boolean>(false);
+    const [isLoggingOut, setIsLoggingOut] = useState<boolean>(false); // Add this state
     const pathname = usePathname();
     const router = useRouter();
 
@@ -47,27 +47,47 @@ export function AuthProvider({ initialUser, children }: { initialUser: User | nu
             // 3. We didn't get initialUser from server (meaning this is a client-side navigation) AND
             // 4. We're not in the middle of logging out AND
             // 5. Give some time after potential logout operations
-            if (user || pathname === '/signin' || initialUser || isLoggingOut) return;
+            if (user || pathname === '/signin' || initialUser || isLoggingOut) {
+                console.log('⏭️ AUTH_CONTEXT: Skipping bootstrap -', { 
+                    hasUser: !!user, 
+                    isSigninPage: pathname === '/signin', 
+                    hasInitialUser: !!initialUser, 
+                    isLoggingOut 
+                });
+                return;
+            }
+            
+            console.log('🚀 AUTH_CONTEXT: Starting bootstrap process...');
             
             // Additional safety check: wait a bit to ensure any logout operations have completed
             await new Promise(resolve => setTimeout(resolve, 100));
             
             // Check again after the delay
-            if (ignore || isLoggingOut) return;
+            if (ignore || isLoggingOut) {
+                return;
+            }
             
             setIsLoading(true);
             try {
-                const sessionToken = await getSession();
+                const sessionUser = await getSession();
                 if (!ignore && !isLoggingOut) {
-                    setUser(sessionToken);
+                    if (sessionUser) {
+                        setUser(sessionUser);
+                    } else {
+                        console.log('AUTH_CONTEXT: No valid session found');
+                        setUser(null);
+                    }
                 }
-            } catch {
+            } catch (error) {
+                console.error('AUTH_CONTEXT: Bootstrap error:', error);
                 // If session check fails, make sure user is null
                 if (!ignore && !isLoggingOut) {
                     setUser(null);
                 }
             } finally {
-                if (!ignore) setIsLoading(false);
+                if (!ignore) {
+                    setIsLoading(false);
+                }
             }
         }
         bootstrap();
@@ -90,6 +110,7 @@ export function AuthProvider({ initialUser, children }: { initialUser: User | nu
         }
     };
 
+    // Alternative logout method using router.replace with additional safeguards
     const logout = async () => {
         setIsLoading(true);
         setIsLoggingOut(true); // Set logout flag
@@ -118,8 +139,20 @@ export function AuthProvider({ initialUser, children }: { initialUser: User | nu
             
             console.log('Logout API completed successfully');
             
-            // Force a hard navigation to signin page to clear any cached state
-            window.location.href = '/signin';
+            // Clear state one more time to be sure
+            setUser(null);
+            
+            // Use router.replace instead of hard navigation
+            router.replace('/signin');
+            
+            // Additional safety: if still not on signin page after a delay, force navigation
+            setTimeout(() => {
+                if (window.location.pathname !== '/signin') {
+                    console.log('Forced navigation to signin page');
+                    window.location.href = '/signin';
+                }
+            }, 1000);
+            
         } catch (error) {
             // Even if API call fails, we've cleared local state
             console.error('Logout API call failed:', error);
@@ -140,11 +173,12 @@ export function AuthProvider({ initialUser, children }: { initialUser: User | nu
                 }
             }
             
+            // Force navigation on error
             window.location.href = '/signin';
         } finally {
             setIsLoading(false);
-            // Reset logout flag after a longer delay since we're doing a hard navigation
-            setTimeout(() => setIsLoggingOut(false), 5000);
+            // Reset logout flag after navigation completes
+            setTimeout(() => setIsLoggingOut(false), 3000);
         }
     };
 

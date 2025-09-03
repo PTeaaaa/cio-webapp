@@ -2,6 +2,10 @@
 .dist/
 dist/
 
+#environment
+.env
+.env.local
+
 # IDE files
 .idea/
 .vscode/

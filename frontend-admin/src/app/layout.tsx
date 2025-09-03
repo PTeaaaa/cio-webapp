@@ -4,7 +4,7 @@ import './globals.css';
 import { SidebarProvider } from '@/contexts/SidebarContext';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { NavigationProvider } from '@/contexts/NavigationContext';
-import { AuthProvider } from '@/contexts/AuthContext';
+import { AuthProvider } from '@/contexts/AuthContext-alternative';
 import { getServerSessionUser } from '@/lib/serverSession';
 
 export const dynamic = 'force-dynamic';

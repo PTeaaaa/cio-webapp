@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Put, Delete, Body, Query, Param, UseGuards, Req, ParseUUIDPipe, ValidationPipe, DefaultValuePipe, ParseIntPipe } from '@nestjs/common';
 import { PeopleService } from './people.service';
-import { SessionGuard } from '@/auth/guards/session.guard';
+import { JwtGuard } from '@/auth/guards/jwt.guard';
 import { Request } from 'express';
 import { SessionUser } from '@/auth/auth.service';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
@@ -18,7 +18,7 @@ export class PeopleController {
     constructor(private readonly peopleService: PeopleService) { }
 
     @Post('createpeople')
-    @UseGuards(SessionGuard, RolesGuard)
+    @UseGuards(JwtGuard, RolesGuard)
     @Roles(Role.Admin, Role.User)
     createPerson(
         @Body(new ValidationPipe()) createPersonDto: CreatePersonDto,
@@ -50,7 +50,7 @@ export class PeopleController {
     }
 
     @Put('updatepeople/:id')
-    @UseGuards(SessionGuard, RolesGuard)
+    @UseGuards(JwtGuard, RolesGuard)
     @Roles(Role.Admin, Role.User)
     updatePerson(
         @Req() req: RequestWithuser,
@@ -61,7 +61,7 @@ export class PeopleController {
     }
 
     @Delete('deletepeople/:id')
-    @UseGuards(SessionGuard, RolesGuard)
+    @UseGuards(JwtGuard, RolesGuard)
     @Roles(Role.Admin, Role.User)
     deletePerson(
         @Req() req: RequestWithuser,

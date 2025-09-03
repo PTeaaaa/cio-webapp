@@ -8,7 +8,7 @@ import {
   ChevronDownIcon,
   HorizontaLDots,
 } from "../icons/index";
-import { House, MapPinHouse, Pencil, DoorClosed, UserCircleIcon, ListIcon, TableIcon, PieChartIcon, UserRoundPlus } from "lucide-react";
+import { House, MapPinHouse, Pencil, DoorClosed, UserCircleIcon, ListIcon, TableIcon, PieChartIcon, Contact } from "lucide-react";
 import { CalenderIcon, PageIcon, BoxCubeIcon, PlugInIcon } from "@/icons/index";
 import { useNavigation } from "@/contexts/NavigationContext";
 
@@ -25,7 +25,7 @@ const iconMap = {
   PieChartIcon,
   BoxCubeIcon,
   PlugInIcon,
-  UserRoundPlus
+  Contact
 }
 
 type NavItem = {

@@ -7,13 +7,13 @@
         },
         {
             "icon": "MapPinHouse",
-            "name": "สถานที่ของคุณ",
-            "subItems": []
+            "name": "สถานที่ของคุณ"
         },
         {
-            "icon": "UserRoundPlus",
-            "name": "เพิ่มบัญชีผู้ใช้",
-            "path": "/listaccounts"
+            "icon": "Contact",
+            "name": "ข้อมูลบัญชีผู้ใช้",
+            "path": "/listaccounts",
+            "role": ["admin"]
         }
     ]
 }

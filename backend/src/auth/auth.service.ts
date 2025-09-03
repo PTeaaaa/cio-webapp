@@ -5,6 +5,7 @@ import { randomBytes } from 'crypto';
 import * as bcrypt from 'bcrypt';
 import { Response } from 'express';
 import { getSessionCookieOpts } from './session/session-cookie';
+import { SignJWT } from 'jose';
 
 export interface SessionUser {
     id: string;
@@ -20,7 +21,7 @@ export class AuthService {
     ) { }
 
     // Enhanced signup method with validation and error handling
-    async signup(username: string, password: string, role: string) {
+    async signup(username: string, password: string, role: string, assignPlace: string[]) {
         // Validate input
         if (!username || username.trim().length < 3) {
             throw new BadRequestException('Username must be at least 3 characters long');
@@ -45,36 +46,129 @@ export class AuthService {
 
         try {
             const hashedPassword = await bcrypt.hash(password, 12);
-            const account = await this.prisma.account.create({
-                data: {
-                    username: username.trim(),
-                    password: hashedPassword,
-                    role,
-                },
+
+            // Create account with assigned places in a transaction
+            const result = await this.prisma.$transaction(async (prisma) => {
+                // Create the account
+                const account = await prisma.account.create({
+                    data: {
+                        username: username.trim(),
+                        password: hashedPassword,
+                        role,
+                    },
+                });
+
+                // Create account-place relationships if assignPlace is provided
+                if (assignPlace && assignPlace.length > 0) {
+                    // Validate that all place IDs exist
+                    const existingPlaces = await prisma.place.findMany({
+                        where: {
+                            id: { in: assignPlace }
+                        }
+                    });
+
+                    if (existingPlaces.length !== assignPlace.length) {
+                        throw new BadRequestException('One or more place IDs are invalid');
+                    }
+
+                    // Create account-place relationships
+                    await prisma.accountPlace.createMany({
+                        data: assignPlace.map(placeId => ({
+                            accountId: account.id,
+                            placeId: placeId
+                        })),
+                        skipDuplicates: true
+                    });
+                }
+
+                return account;
             });
 
             // Return user without password
-            const { password: _, ...result } = account;
-            return result;
+            const { password: _, ...accountResult } = result;
+            return accountResult;
         } catch (error) {
+            if (error instanceof BadRequestException) {
+                throw error;
+            }
             throw new BadRequestException('Failed to create account');
         }
     }
 
+    // You will need methods to generate tokens
+    private async createAccessToken(user: { id: string, username: string, role: string }): Promise<string> {
+
+        const secret = new TextEncoder().encode(this.configService.get('JWT_SECRET_KEY'));
+        const token = await new SignJWT({ role: user.role, username: user.username })
+            .setProtectedHeader({ alg: 'HS256' })
+            .setSubject(user.id)
+            .setIssuedAt()
+            .setExpirationTime('1h') // Short life!
+            .sign(secret);
+
+        return token;
+    }
+
+    private async createRefreshToken(userId: string, res: Response): Promise<string> {
+
+        const refreshToken = randomBytes(32).toString('base64url');
+        const hashedToken = await bcrypt.hash(refreshToken, 12);
+        const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+
+        // Store the HASHED refresh token in the database
+        await this.prisma.account.update({
+            where: { id: userId },
+            data: { refreshToken: hashedToken, refreshTokenExpiresAt: expires },
+        });
+
+        // Set the RAW refresh token in a secure cookie
+        res.cookie('rt', refreshToken, getSessionCookieOpts(this.configService));
+
+        return refreshToken;
+    }
+
+    async refreshToken(oldRefreshToken: string) {
+
+        // Find user by matching the hashed refresh token
+        const accounts = await this.prisma.account.findMany({
+            where: {
+                refreshToken: { not: null },
+                refreshTokenExpiresAt: { gt: new Date() }
+            }
+        });
+
+        const account = accounts.find(acc => bcrypt.compareSync(oldRefreshToken, acc.refreshToken!));
+
+        if (!account) {
+            console.log('AUTH_SERVICE: Invalid or expired refresh token provided');
+            throw new UnauthorizedException('Invalid or expired refresh token.');
+        }
+
+        // Issue a new access token
+        const newAccessToken = await this.createAccessToken(account);
+
+        return { accessToken: newAccessToken };
+    }
+
     async login(username: string, password: string, res: Response) {
+
         const account = await this.prisma.account.findUnique({
             where: { username },
         });
 
         if (!account || !(await bcrypt.compare(password, account.password))) {
-            throw new UnauthorizedException('Invalid credentials. Please check username and password.');
+            console.log('AUTH_SERVICE: Invalid credentials for username:', username);
+            throw new UnauthorizedException('Invalid credentials.');
         }
 
-        // Issue session instead of JWT tokens
-        await this.issueSession(account.id, res);
+        // Create both tokens
+        const accessToken = await this.createAccessToken(account);
+        await this.createRefreshToken(account.id, res);
 
         const { password: _, ...userWithoutPassword } = account;
-        return userWithoutPassword;
+
+        // Return the user data AND the short-lived access token
+        return { user: userWithoutPassword, accessToken };
     }
 
     async logout(userId: string): Promise<boolean> {
@@ -90,48 +184,5 @@ export class AuthService {
             },
         });
         return true;
-    }
-
-    async verifyUser(username: string, password: string) {
-
-        const user = await this.prisma.account.findFirst({
-            where: { username: username }
-        });
-        if (!user) throw new UnauthorizedException('Invalid credentials');
-
-        // ถ้าคุณยังไม่ใช้ bcrypt ให้เปลี่ยนมาเทียบ plain หรือ argon2
-        const ok = await bcrypt.compare(password, user.password);
-        if (!ok) throw new UnauthorizedException('Invalid credentials');
-
-        return user;
-    }
-
-    // สร้าง session ID แบบสุ่ม
-    async issueSession(userId: string, res: Response) {
-        
-        const sid = randomBytes(32).toString('base64url');
-        const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-
-        await this.prisma.account.update({
-            where: { id: userId },
-            data: {
-                sessionId: sid,
-                sessionExpiredAt: expires, // ถ้าไม่ใช้ expiry ฝั่ง server ให้ลบบรรทัดนี้
-                sessionRevokedAt: null,
-            },
-        });
-
-        res.cookie('sid', sid, getSessionCookieOpts(this.configService));
-    }
-
-    async revokeBySid(sid: string) {
-        await this.prisma.account.updateMany({
-            where: { sessionId: sid },
-            data: {
-                sessionId: null,
-                sessionRevokedAt: new Date(),
-                sessionExpiredAt: null
-            },
-        });
     }
 }

@@ -15,4 +15,8 @@ export class SignupDto {
   @IsNotEmpty()
   @IsIn(['admin', 'user', 'moderator'])
   role!: string;
+
+  @IsString({ each: true })
+  @IsNotEmpty({ each: true })
+  assignPlace!: string[];
 }

@@ -1,4 +1,3 @@
-// src/services/apiFetch/apiFetch.ts
 export type ApiFetchOptions = Omit<RequestInit, 'headers' | 'credentials'> & {
   /** auto JSON.stringify และตั้ง Content-Type */
   json?: unknown;
@@ -10,36 +9,133 @@ export type ApiFetchOptions = Omit<RequestInit, 'headers' | 'credentials'> & {
   headers?: HeadersInit;
   /** ค่าเริ่มต้นคือ include */
   credentials?: RequestCredentials;
+  /** Skip automatic JWT token attachment for public endpoints */
+  skipAuth?: boolean;
 };
 
 const API_BASE = (process.env.NEXT_PUBLIC_NESTJS_API_URL ?? '').replace(/\/+$/, '');
 
-export async function apiFetch(endpoint: string, opts: ApiFetchOptions = {}) {
+// Endpoints that don't need authentication
+const PUBLIC_ENDPOINTS = ['/auth/login', '/auth/signup', '/auth/refresh-token'];
+
+// Token refresh state to prevent multiple concurrent refresh requests
+let isRefreshing = false;
+let refreshPromise: Promise<string | null> | null = null;
+
+// Helper function to check if JWT token is expired
+function isTokenExpired(token: string): boolean {
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const currentTime = Math.floor(Date.now() / 1000);
+    return payload.exp < currentTime;
+  } catch {
+    return true; // If we can't parse it, consider it expired
+  }
+}
+
+async function refreshAccessToken(): Promise<string | null> {
+  try {
+    const response = await fetch(`${API_BASE}/auth/refresh-token`, {
+      method: 'POST',
+      credentials: 'include', // This sends the refresh token cookie
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      console.log('APIFETCH: Refresh token failed with status:', response.status);
+      // Clear any stored access token
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('accessToken');
+      }
+      return null;
+    }
+
+    const data = await response.json();
+    const newAccessToken = data.accessToken;
+
+    if (!newAccessToken) {
+      console.log('APIFETCH: No access token in refresh response');
+      return null;
+    }
+
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('accessToken', newAccessToken);
+    }
+    return newAccessToken;
+  } catch (error) {
+    console.error('APIFETCH: Error refreshing token:', error);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('accessToken');
+    }
+    return null;
+  }
+}
+
+export async function apiFetch(endpoint: string, opts: ApiFetchOptions = {}): Promise<Response> {
   const {
     json,
     formData,
-    timeoutMs,
+    timeoutMs = 20000,
     headers,
     credentials = 'include',
+    skipAuth = false,
     ...rest
   } = opts;
 
-  const controller = new AbortController();
-  const timer = timeoutMs ? setTimeout(() => controller.abort('timeout'), timeoutMs) : undefined;
+  const isPublicEndpoint = PUBLIC_ENDPOINTS.some(publicEndpoint =>
+    endpoint.startsWith(publicEndpoint)
+  );
 
-  // ไม่มีการอ่าน localStorage และไม่เติม Authorization header ใดๆ
+  // Build headers
   const finalHeaders: HeadersInit = {
+    'Accept': 'application/json',
     ...(formData ? {} : { 'Content-Type': 'application/json' }),
     ...headers,
   };
 
+  // Add Authorization header for protected endpoints
+  if (!isPublicEndpoint && !skipAuth && typeof window !== 'undefined') {
+    let accessToken = localStorage.getItem('accessToken');
+
+    // Check if token is expired and proactively refresh it
+    if (accessToken && isTokenExpired(accessToken)) {
+
+      // Prevent multiple concurrent refresh attempts
+      if (!isRefreshing) {
+        isRefreshing = true;
+        refreshPromise = refreshAccessToken();
+      }
+
+      const newToken = await refreshPromise;
+      isRefreshing = false;
+      refreshPromise = null;
+
+      if (newToken) {
+        accessToken = newToken;
+      } else {
+        console.log('APIFETCH: Proactive refresh failed for:', endpoint);
+        accessToken = null;
+      }
+    }
+
+    if (accessToken) {
+      (finalHeaders as Record<string, string>)['Authorization'] = `Bearer ${accessToken}`;
+    }
+  }
+
   const body =
     formData ? formData :
-    json !== undefined ? JSON.stringify(json) :
-    rest.body;
+      json !== undefined ? JSON.stringify(json) :
+        rest.body;
+
+  const controller = new AbortController();
+  const timer = timeoutMs ? setTimeout(() => controller.abort('timeout'), timeoutMs) : undefined;
 
   try {
-    return await fetch(`${API_BASE}${endpoint}`, {
+
+    const response = await fetch(`${API_BASE}${endpoint}`, {
       ...rest,
       credentials,
       cache: rest.cache ?? 'no-store',
@@ -47,83 +143,65 @@ export async function apiFetch(endpoint: string, opts: ApiFetchOptions = {}) {
       body,
       signal: controller.signal,
     });
+
+    // If we get a 401 and it's not a public endpoint, try to refresh the token
+    if (response.status === 401 && !isPublicEndpoint && !skipAuth) {
+
+      // Prevent multiple concurrent refresh attempts
+      if (!isRefreshing) {
+        isRefreshing = true;
+        refreshPromise = refreshAccessToken();
+      }
+
+      const newToken = await refreshPromise;
+      isRefreshing = false;
+      refreshPromise = null;
+
+      if (newToken) {
+        // Create a new AbortController for the retry request
+        const retryController = new AbortController();
+        const retryTimer = timeoutMs ? setTimeout(() => retryController.abort('timeout'), timeoutMs) : undefined;
+
+        try {
+          // Retry the original request with the new token
+          const retryHeaders = {
+            ...finalHeaders,
+            'Authorization': `Bearer ${newToken}`
+          };
+
+          const retryResponse = await fetch(`${API_BASE}${endpoint}`, {
+            ...rest,
+            credentials,
+            cache: rest.cache ?? 'no-store',
+            headers: retryHeaders,
+            body,
+            signal: retryController.signal,
+          });
+
+          if (!retryResponse.ok) {
+            console.log('APIFETCH: Retry failed for', endpoint, 'with status:', retryResponse.status);
+          }
+
+          return retryResponse;
+
+        } finally {
+          if (retryTimer) clearTimeout(retryTimer);
+        }
+
+      } else {
+
+        console.log('APIFETCH: Token refresh failed for', endpoint, '- returning 401 response');
+        // Token refresh failed, return the original 401 response
+        return response;
+      }
+    }
+
+    if (!response.ok) {
+      console.log('APIFETCH: Request failed with status:', response.status);
+    }
+
+    return response;
   } finally {
     if (timer) clearTimeout(timer);
   }
 }
-
-// type ApiFetchOptions = Omit<RequestInit, "headers" | "credentials"> & {
-//   /** If provided, auto JSON.stringify and set Content-Type */
-//   json?: unknown;
-//   /** If provided, use as body and DO NOT set Content-Type */
-//   formData?: FormData;
-//   /** Default: 'include' so cookies (refresh) flow */
-//   credentials?: RequestCredentials;
-//   /** Optional fetch timeout (ms) */
-//   timeoutMs?: number;
-//   /** Extra headers to merge */
-//   headers?: HeadersInit;
-// };
-
-// const BASE = (process.env.NEXT_PUBLIC_NESTJS_API_URL ?? "").replace(/\/+$/, "");
-
-// // Treat these endpoints as public: don't send Authorization even if a token exists
-// const AUTH_PUBLIC_ENDPOINT = /^\/auth\/(login|refresh|signup|logout)(\/|$)/i;
-
-// export async function apiFetch(endpoint: string, options: ApiFetchOptions = {}) {
-
-//   const {
-//     json,
-//     formData,
-//     timeoutMs = 20000,
-//     headers: extraHeaders,
-//     credentials,
-//     method = "GET",
-//     // everything else goes straight to fetch
-//     ...rest
-//   } = options;
-
-//   const baseHeaders: Record<string, string> = { Accept: "application/json" };
-
-//   // Build body carefully
-//   let body: BodyInit | undefined;
-//   if (formData) {
-//     body = formData; // browser sets multipart boundary automatically
-//   } else if (json !== undefined) {
-//     baseHeaders["Content-Type"] = "application/json";
-//     body = JSON.stringify(json);
-//   } else if (rest.body) {
-//     body = rest.body as BodyInit;
-//   }
-
-//   // Authorization header (skip for obvious public auth endpoints)
-//   const shouldAttachAuth = !AUTH_PUBLIC_ENDPOINT.test(endpoint);
-//   const token = shouldAttachAuth ? localStorage.getItem("accessToken") : null;
-//   const authHeader = token ? ({ Authorization: `Bearer ${token}` } as Record<string, string>) : {};
-
-//   // Merge headers
-//   const headers: HeadersInit = {
-//     ...baseHeaders,
-//     ...authHeader,
-//     ...(extraHeaders ?? {}),
-//   };
-
-//   // Timeout with AbortController
-//   const controller = new AbortController();
-//   const id = setTimeout(() => controller.abort(), timeoutMs);
-
-//   try {
-//     const res = await fetch(`${BASE}${endpoint}`, {
-//       method,
-//       headers,
-//       body,
-//       credentials: credentials ?? "include", // keep cookies flowing
-//       cache: rest.cache ?? "no-store",
-//       signal: controller.signal,
-//       ...rest,
-//     });
-//     return res;
-//   } finally {
-//     clearTimeout(id);
-//   }
-// }

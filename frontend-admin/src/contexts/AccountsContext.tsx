@@ -2,12 +2,14 @@
 
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { AccountForm } from "@/types";
-import { getAllAccounts } from '@/services/accounts/accountAPI';
+import { getAllAccounts, createAccount, SignupPayload } from '@/services/accounts/accountAPI';
 
 interface AuthContextType {
     accounts: AccountForm[];
     accountsLoading: boolean;
     accountsError: string | null;
+    refreshAccounts: () => Promise<void>;
+    signUp: (payload: SignupPayload) => Promise<{ success: boolean; error?: string }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -45,7 +47,47 @@ export function AccountsProvider({ children }: { children: React.ReactNode }) {
         fetchAccounts();
     }, []);
 
-    const value = useMemo(() => ({ accounts, accountsLoading, accountsError }), [accounts, accountsLoading, accountsError]);
+    const refreshAccounts = async () => {
+        try {
+            setAccountsLoading(true);
+            const data = await getAllAccounts();
+            if (data) {
+                setAccounts(data);
+                setAccountsError(null);
+            } else {
+                setAccountsError("Failed to refresh accounts");
+            }
+        } catch (err) {
+            setAccountsError("Error refreshing accounts");
+            console.error("Error refreshing accounts:", err);
+        } finally {
+            setAccountsLoading(false);
+        }
+    };
+
+    const signUp = async (payload: SignupPayload): Promise<{ success: boolean; error?: string }> => {
+        try {
+            setAccountsError(null);
+            const result = await createAccount(payload);
+            
+            // Automatically refresh accounts list after successful creation
+            await refreshAccounts();
+            
+            return { success: true };
+        } catch (err: any) {
+            const errorMessage = err.message || "Failed to create account";
+            setAccountsError(errorMessage);
+            return { success: false, error: errorMessage };
+        }
+    };
+
+    const value = useMemo(() => ({ 
+        accounts, 
+        accountsLoading, 
+        accountsError,
+        refreshAccounts,
+        signUp
+    }), [accounts, accountsLoading, accountsError]);
 
     if (accountsLoading) {
         return <div className="text-center py-4 text-gray-500">กำลังโหลดข้อมูล...</div>;
@@ -56,5 +98,4 @@ export function AccountsProvider({ children }: { children: React.ReactNode }) {
     }
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-
 }

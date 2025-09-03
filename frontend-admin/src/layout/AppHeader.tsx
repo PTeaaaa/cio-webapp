@@ -5,7 +5,7 @@ import UserDropdown from "@/components/header/UserDropdown";
 import { useSidebar } from "@/contexts/SidebarContext";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useState ,useEffect,useRef} from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 const AppHeader: React.FC = () => {
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false);
@@ -85,18 +85,18 @@ const AppHeader: React.FC = () => {
             ) : (
               <svg
                 key="open-icon"
-                xmlns="http://www.w3.org/2000/svg" 
-                width="23" 
-                height="23" 
-                viewBox="0 0 25 25" 
-                fill="none" 
-                stroke="currentColor" 
+                xmlns="http://www.w3.org/2000/svg"
+                width="23"
+                height="23"
+                viewBox="0 0 25 25"
+                fill="none"
+                stroke="currentColor"
                 strokeWidth="2"
                 className="lucide lucide-panels-top-left-icon lucide-panels-top-left">
-                  
-                <rect width="18" height="18" x="3" y="3" rx="2"/>
-                <path d="M3 9h18"/>
-                <path d="M9 21V9"/>
+
+                <rect width="18" height="18" x="3" y="3" rx="2" />
+                <path d="M3 9h18" />
+                <path d="M9 21V9" />
               </svg>
             )}
             {/* Cross Icon */}
@@ -175,21 +175,22 @@ const AppHeader: React.FC = () => {
           </div>
         </div>
         <div
-          className={`${
-            isApplicationMenuOpen ? "flex" : "hidden"
-          } items-center justify-end w-full gap-4 px-5 py-4 lg:flex shadow-theme-md lg:px-0 lg:shadow-none`}
+          className={`${isApplicationMenuOpen ? "flex" : "hidden"
+            } items-center justify-end w-full gap-4 px-5 py-4 lg:flex shadow-theme-md lg:px-0 lg:shadow-none`}
         >
           <div className="flex items-center gap-2 2xsm:gap-3">
+
             {/* <!-- Dark Mode Toggler --> */}
             <ThemeToggleButton />
             {/* <!-- Dark Mode Toggler --> */}
 
-           <NotificationDropdown /> 
             {/* <!-- Notification Menu Area --> */}
+            {/* <NotificationDropdown /> */}
+
           </div>
           {/* <!-- User Area --> */}
-          <UserDropdown /> 
-    
+          <UserDropdown />
+
         </div>
       </div>
     </header>
