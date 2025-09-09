@@ -1,30 +1,36 @@
 [
     {
-        "keyMain" : "Department",
+        "keyMain": "Ministry of Public Health",
+        "title": "กระทรวงสาธารณสุข",
+        "url": "/Department/e721fcd3-c909-4b37-b293-43542588bf1b/f28eba71-42c4-4284-a439-9489e74da6d3",
+        "logo": "Building2"
+    },
+    {
+        "keyMain": "Department",
         "title": "กรม",
         "url": "/Department?page=1",
         "logo": "Building2"
     },
     {
-        "keyMain" : "State",
+        "keyMain": "State",
         "title": "เขตสุขภาพ",
         "url": "/State?page=1",
         "logo": "Grid2X2"
     },
     {
-        "keyMain" : "Office",
+        "keyMain": "Office",
         "title": "สำนักงานสาธารณสุขจังหวัด",
         "url": "/Office?page=1",
         "logo": "Bandage"
     },
     {
-        "keyMain" : "HCenter",
+        "keyMain": "HCenter",
         "title": "โรงพยาบาลศูนย์",
         "url": "/HCenter?page=1",
         "logo": "Hospital"
     },
     {
-        "keyMain" : "HGeneral",
+        "keyMain": "HGeneral",
         "title": "โรงพยาบาลทั่วไป",
         "url": "/HGeneral?page=1",
         "logo": "Ambulance"

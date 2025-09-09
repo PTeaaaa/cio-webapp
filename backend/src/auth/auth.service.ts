@@ -98,31 +98,45 @@ export class AuthService {
     // You will need methods to generate tokens
     private async createAccessToken(user: { id: string, username: string, role: string }): Promise<string> {
 
-        const secret = new TextEncoder().encode(this.configService.get('JWT_SECRET_KEY'));
+        const secret = new TextEncoder().encode(this.configService.get<string>('jwt.secretKey'));
+        const expires = this.configService.get<string>('jwt.accessExpirationTime');
         const token = await new SignJWT({ role: user.role, username: user.username })
             .setProtectedHeader({ alg: 'HS256' })
             .setSubject(user.id)
             .setIssuedAt()
-            .setExpirationTime('1h') // Short life!
+            .setExpirationTime(expires!)
             .sign(secret);
 
         return token;
     }
 
-    private async createRefreshToken(userId: string, res: Response): Promise<string> {
+    private async createRefreshToken(userId: string, res: Response, rememberMe: boolean = true): Promise<string> {
 
+        const maxAge = this.configService.get<number>('jwt.refreshCookieMaxAge');
         const refreshToken = randomBytes(32).toString('base64url');
         const hashedToken = await bcrypt.hash(refreshToken, 12);
-        const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+        const expires = new Date(Date.now() + maxAge!);
 
-        // Store the HASHED refresh token in the database
+        // Store the HASHED refresh token in the database AND update session preference
         await this.prisma.account.update({
             where: { id: userId },
-            data: { refreshToken: hashedToken, refreshTokenExpiresAt: expires },
+            data: { 
+                refreshToken: hashedToken, 
+                refreshTokenExpiresAt: expires,
+                rememberMeSession: rememberMe  // Store session preference
+            },
         });
 
         // Set the RAW refresh token in a secure cookie
-        res.cookie('rt', refreshToken, getSessionCookieOpts(this.configService));
+        // If rememberMe is false, don't set maxAge to make it a session cookie
+        const cookieOptions = getSessionCookieOpts(this.configService);
+        if (!rememberMe) {
+            // Remove maxAge to make it a session cookie
+            const { maxAge, ...sessionCookieOptions } = cookieOptions;
+            res.cookie('rt', refreshToken, sessionCookieOptions);
+        } else {
+            res.cookie('rt', refreshToken, cookieOptions);
+        }
 
         return refreshToken;
     }
@@ -137,7 +151,7 @@ export class AuthService {
             }
         });
 
-        const account = accounts.find(acc => bcrypt.compareSync(oldRefreshToken, acc.refreshToken!));
+        const account = accounts.find(acc => acc.refreshToken && bcrypt.compareSync(oldRefreshToken, acc.refreshToken));
 
         if (!account) {
             console.log('AUTH_SERVICE: Invalid or expired refresh token provided');
@@ -147,10 +161,14 @@ export class AuthService {
         // Issue a new access token
         const newAccessToken = await this.createAccessToken(account);
 
-        return { accessToken: newAccessToken };
+        // Return the access token AND the stored session preference
+        return { 
+            accessToken: newAccessToken,
+            rememberMe: account.rememberMeSession ?? account.rememberMe  // Use session preference, fallback to default
+        };
     }
 
-    async login(username: string, password: string, res: Response) {
+    async login(username: string, password: string, res: Response, rememberMe: boolean = true) {
 
         const account = await this.prisma.account.findUnique({
             where: { username },
@@ -161,9 +179,21 @@ export class AuthService {
             throw new UnauthorizedException('Invalid credentials.');
         }
 
-        // Create both tokens
+        // Use the provided rememberMe (from checkbox) or fallback to user's default preference
+        const sessionRememberMe = rememberMe ?? account.rememberMe;
+
+        // Update last login and session preference
+        await this.prisma.account.update({
+            where: { id: account.id },
+            data: {
+                lastLoginAt: new Date(),
+                rememberMeSession: sessionRememberMe,  // Store this session's choice
+            }
+        });
+
+        // Create both tokens using the session preference
         const accessToken = await this.createAccessToken(account);
-        await this.createRefreshToken(account.id, res);
+        await this.createRefreshToken(account.id, res, sessionRememberMe);
 
         const { password: _, ...userWithoutPassword } = account;
 
@@ -181,8 +211,17 @@ export class AuthService {
             },
             data: {
                 sessionId: null,
+                rememberMeSession: null,  // Clear session preference on logout
             },
         });
         return true;
+    }
+
+    // Method to update user's default remember me preference (for settings page)
+    async updateRememberMePreference(userId: string, rememberMe: boolean): Promise<void> {
+        await this.prisma.account.update({
+            where: { id: userId },
+            data: { rememberMe }
+        });
     }
 }

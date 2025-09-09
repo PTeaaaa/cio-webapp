@@ -1,12 +1,16 @@
-import { Injectable, ForbiddenException, NotFoundException, BadRequestException, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { PrismaService } from "@/prisma/prisma.service";
 import { SessionUser } from "@/auth/auth.service";
 import { CreatePersonDto } from './dto/create-person.dto';
 import { UpdatePersonDto } from './dto/update-person.dto';
+import { MinioService } from '@/minio/minio.service';
 
 @Injectable()
 export class PeopleService {
-    constructor(private readonly prisma: PrismaService) { }
+    constructor(
+        private readonly prisma: PrismaService,
+        private readonly minioService: MinioService,
+    ) { }
 
     async getPeopleByPlaceId(id: string) {
         const people = await this.prisma.person.findMany({
@@ -153,6 +157,34 @@ export class PeopleService {
 
             return updatedPerson;
         });
+    }
+
+    async uploadPersonImage(file: Express.Multer.File, personId: string): Promise<string> {
+        if (!file) {
+            throw new BadRequestException('No file provided for upload.');
+        }
+
+        try {
+            // 1. อัปโหลดไฟล์ไปยัง MinIO
+            const imageUrl = await this.minioService.uploadFile(file);
+
+            // 2. บันทึก URL ของรูปภาพลงในฐานข้อมูลสำหรับ Person โดยใช้ Prisma
+            const updatedPerson = await this.prisma.person.update({
+                where: { id: personId },
+                data: { imageUrl },
+            });
+
+            if (!updatedPerson) {
+                throw new NotFoundException(`Person with ID "${personId}" not found.`);
+            }
+
+            return imageUrl; // คืนค่า URL ของรูปภาพที่อัปโหลด
+        }
+        catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            // Log error และ throw InternalServerErrorException
+            throw new InternalServerErrorException(`Failed to upload and save image: ${errorMessage}`);
+        }
     }
 
     async deletePerson(user: SessionUser, personId: string): Promise<{ message: string }> {

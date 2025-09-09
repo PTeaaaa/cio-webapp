@@ -1,8 +1,8 @@
 "use client";
 import { ReactNode, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { useAuth } from "@/contexts/AuthContext-alternative"; // เวอร์ชันใหม่
-// import { redirectByRole } from "@/utils/routeUtils"; // ถ้าต้องใช้
+import { useAuth } from "@/contexts/AuthContext";
+import { redirectByRole, canAccessPath, pathForRole } from "@/utils/routeUtils";
 
 type Props = {
   children: ReactNode;
@@ -43,13 +43,21 @@ export default function ProtectedRoute({
         return;
       }
 
-      if (user) {
+      if (user && !isLoggingOut) {
+        // Check if user has permission to access current path
+        if (!canAccessPath(user.role, pathname)) {
+          console.log('PROTECTED_ROUTE: User role not allowed for path:', user.role, pathname);
+          // Redirect to appropriate page based on user role
+          const allowedPath = pathForRole(user.role);
+          router.replace(allowedPath);
+          return;
+        }
 
+        // Legacy: Check allowedRoles if provided (for backward compatibility)
         if (allowedRoles?.length && (!user.role || !allowedRoles.includes(user.role))) {
-          console.log('PROTECTED_ROUTE: User role not allowed:', user.role);
-          // ถ้าคุณมีฟังก์ชันกำหนดเส้นทางตาม role ก็เรียกที่นี่ได้
-          // redirectByRole(user.role, router, { replace: true });
-          router.replace("/not-found"); // หรือหน้า default ของคุณ
+          console.log('PROTECTED_ROUTE: User role not in allowedRoles:', user.role);
+          const allowedPath = pathForRole(user.role);
+          router.replace(allowedPath);
         }
       }
     }, 1200); // Give a bit more time for token refresh

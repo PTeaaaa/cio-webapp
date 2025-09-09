@@ -6,6 +6,26 @@ import { Prisma } from '@prisma/client';
 export class PlacesService {
     constructor(private readonly prisma: PrismaService) { }
 
+    async getAllPlaces() {
+        try {
+            const places = await this.prisma.place.findMany({
+                orderBy: {
+                    numberOrder: 'asc',
+                },
+                select: {
+                    id: true,
+                    name: true,
+                    agency: true,
+                },
+            });
+
+            return places;
+        } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            throw new InternalServerErrorException(`Failed to fetch all places: ${errorMessage}`);
+        }
+    }
+
     async getPlaceById(id: string) {
         const place = await this.prisma.place.findUnique({
             where: { id },

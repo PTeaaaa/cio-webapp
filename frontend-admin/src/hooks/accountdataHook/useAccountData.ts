@@ -2,102 +2,91 @@
 
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { usePeople } from "@/contexts/PeopleContext";
+import { useAccounts } from "@/contexts/AccountsContext";
 import { useModal } from "@/hooks/useModal";
-import { PersonForm, UpdatePersonPayload } from "@/types";
+import { AccountForm, UpdateAccountPayload } from "@/types";
 
 export function useAccountData() {
     const { isOpen, openModal, closeModal } = useModal();
-    const { people, updatePerson, loading: contextLoading, placeId } = usePeople();
+    const { accounts, updateAccountData, accountsLoading, getAccount } = useAccounts();
     const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
     const searchParams = useSearchParams();
     const router = useRouter();
-    const personID = searchParams.get("id") ?? "default";
+    const accountID = searchParams.get("id") ?? "default";
 
     // ข้อมูลเดิม (ที่โหลดมาในตอนแรก)
-    const [originalData, setOriginalData] = useState<PersonForm | null>(null);
-    const [formData, setFormData] = useState<UpdatePersonPayload>({
-        prefix: "",
-        name: "",
-        surname: "",
-        email: "",
-        phone: "",
-        position: "",
-        placeId: "",
+    const [originalData, setOriginalData] = useState<AccountForm | null>(null);
+    const [formData, setFormData] = useState<UpdateAccountPayload>({
+        username: "",
+        role: "",
+        isActive: true,
+        assignedPlaces: [],
     });
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // ตรวจสอบว่า personID ถูกต้องหรือไม่
-        // if (!personID || personID === "default") {
-        //     console.error('No valid person ID found in URL.');
-        //     router.push(`/listpeople/asdf`);
-        //     // /edit?id=${personID}&placeId=${placeId}
-        //     return;
-        // }
+        const fetchAccountData = async () => {
+            // ตรวจสอบว่า accountID ถูกต้องหรือไม่
+            if (!accountID || accountID === "default") {
+                console.error('No valid account ID found in URL.');
+                setLoading(false);
+                return;
+            }
 
-        // ตรวจสอบว่าข้อมูลจาก context โหลดเสร็จหรือยัง
-        if (contextLoading) {
-            setLoading(true);
-            return;
-        }
+            // ตรวจสอบว่าข้อมูลจาก context โหลดเสร็จหรือยัง
+            if (accountsLoading) {
+                setLoading(true);
+                return;
+            }
 
-        // หากข้อมูล people โหลดแล้ว ให้ค้นหาบุคคล
-        const foundPerson = people.find(p => p.id === personID);
-        
-        if (foundPerson) {
-            // สร้าง object PersonForm เพื่อใช้ตั้งค่า state
-            const personFormData: PersonForm = {
-                id: foundPerson.id,
-                prefix: foundPerson.prefix || "",
-                name: foundPerson.name,
-                surname: foundPerson.surname,
-                email: foundPerson.email || "",
-                phone: foundPerson.phone || "",
-                position: foundPerson.position || "",
-                imageUrl: foundPerson.imageUrl,
-                placeId: foundPerson.placeId || "",
-                department:foundPerson.department,
-                year: foundPerson.year,
-            };
+            try {
+                setLoading(true);
+                
+                // หาบัญชีในรายการที่โหลดมาแล้วก่อน
+                let foundAccount = accounts.find(a => a.id === accountID);
+                
+                // หากไม่พบในรายการ ให้ดึงข้อมูลจาก API โดยตรง
+                if (!foundAccount) {
+                    const accountData = await getAccount(accountID);
+                    foundAccount = accountData || undefined;
+                }
 
-            // ตั้งค่าข้อมูลเดิมและข้อมูลฟอร์ม
-            setOriginalData(personFormData);
-            setFormData({
-                prefix: personFormData.prefix,
-                name: personFormData.name,
-                surname: personFormData.surname,
-                email: personFormData.email,
-                phone: personFormData.phone,
-                position: personFormData.position,
-                placeId: personFormData.placeId,
-            });
-            setLoading(false); // ตั้งค่า loading เป็น false หลังจากโหลดข้อมูลเสร็จ
-        } else {
-            // console.error(`Person with ID ${personID} not found!`);
-            // // หากไม่พบบุคคล ให้ redirect ไปหน้า not-found
-            // router.push(`/listpeople/asdf`);
-            setLoading(false); // ตั้งค่า loading เป็น false เพื่อหยุดการโหลด
-        }
-    }, [personID, people, contextLoading, router]);
+                if (foundAccount) {
+                    // ตั้งค่าข้อมูลเดิมและข้อมูลฟอร์ม
+                    setOriginalData(foundAccount);
+                    setFormData({
+                        username: foundAccount.username,
+                        role: foundAccount.role,
+                        isActive: foundAccount.isActive,
+                        assignedPlaces: foundAccount.assignedPlaces?.map(ap => ap.placeId) || [],
+                    });
+                } else {
+                    console.error(`Account with ID ${accountID} not found!`);
+                }
+            } catch (error) {
+                console.error("Error fetching account data:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchAccountData();
+    }, [accountID, accounts, accountsLoading, getAccount]);
 
     // ตรวจสอบว่าข้อมูลมีการเปลี่ยนแปลงหรือไม่
     const hasUnsavedChanges = () => {
         if (!originalData) return false;
         const originalFormData = {
-            prefix: originalData.prefix,
-            name: originalData.name,
-            surname: originalData.surname,
-            email: originalData.email,
-            phone: originalData.phone,
-            position: originalData.position,
-            placeId: originalData.placeId,
+            username: originalData.username,
+            role: originalData.role,
+            isActive: originalData.isActive,
+            assignedPlaces: originalData.assignedPlaces?.map(ap => ap.placeId) || [],
         };
         return JSON.stringify(originalFormData) !== JSON.stringify(formData);
     };
 
-    const handleInputChange = (field: keyof UpdatePersonPayload, value: string) => {
+    const handleInputChange = (field: keyof UpdateAccountPayload, value: string | boolean | string[]) => {
         setFormData(prev => ({
             ...prev,
             [field]: value
@@ -105,14 +94,36 @@ export function useAccountData() {
     };
 
     const handleSave = async () => {
-        // ตรวจสอบว่ามี personID และ originalData หรือไม่ก่อนทำการบันทึก
-        if (personID && originalData) {
+        // ตรวจสอบว่ามี accountID และ originalData หรือไม่ก่อนทำการบันทึก
+        if (accountID && originalData) {
             try {
-                await updatePerson(personID, formData);
-                console.log("Saving changes...", formData);
-                // อัปเดต original data หลังจากบันทึกสำเร็จ
-                setOriginalData({ ...originalData, ...formData });
-                closeModal();
+                const result = await updateAccountData(accountID, formData);
+                if (result.success) {
+                    console.log("Saving changes...", formData);
+                    // อัปเดต original data หลังจากบันทึกสำเร็จ
+                    const updatedAccount: AccountForm = {
+                        ...originalData,
+                        username: formData.username || originalData.username,
+                        role: formData.role || originalData.role,
+                        isActive: formData.isActive ?? originalData.isActive,
+                        assignedPlaces: formData.assignedPlaces ? 
+                            formData.assignedPlaces.map((placeId, index) => ({
+                                id: index,
+                                accountId: originalData.id,
+                                placeId,
+                                place: {
+                                    id: placeId,
+                                    name: "Unknown Place", // This will be updated from server response
+                                    agency: "Unknown Agency"
+                                }
+                            })) : originalData.assignedPlaces,
+                        updatedAt: new Date()
+                    };
+                    setOriginalData(updatedAccount);
+                    closeModal();
+                } else {
+                    console.error("Failed to save changes:", result.error);
+                }
             } catch (error) {
                 console.error("Failed to save changes:", error);
             }
@@ -132,13 +143,10 @@ export function useAccountData() {
         // ตั้งค่า form data กลับเป็นค่าเดิม
         if (originalData) {
             setFormData({
-                prefix: originalData.prefix,
-                name: originalData.name,
-                surname: originalData.surname,
-                email: originalData.email,
-                phone: originalData.phone,
-                position: originalData.position,
-                placeId: originalData.placeId,
+                username: originalData.username,
+                role: originalData.role,
+                isActive: originalData.isActive,
+                assignedPlaces: originalData.assignedPlaces?.map(ap => ap.placeId) || [],
             });
         }
         closeModal();

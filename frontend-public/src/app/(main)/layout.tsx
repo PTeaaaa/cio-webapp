@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Prompt } from "next/font/google";
 import "@/app/globals.css";
 import Header from "@/mycomponents/Header";
 import DirectoryBar from "@/mycomponents/DirectoryBar";
@@ -19,6 +19,13 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const prompt = Prompt({
+  variable: "--font-prompt",
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "CIO Info System",
   description: "Manage and view CIO data",
@@ -30,7 +37,7 @@ export default function RootLayout({ children, }: Readonly<{
 }>) {
   return (
     <html lang="en">
-      <body className={`flex flex-col min-h-lvh ${geistSans.variable} ${geistMono.variable} antialiased bg-[#ededed]`}>
+      <body className={`flex flex-col min-h-lvh antialiased bg-[#ededed] ${geistSans.variable} ${geistMono.variable} ${prompt.variable}`}>
         <Header />
         <BreadcrumbProvider>
           <div className="flex-grow flex flex-col relative">

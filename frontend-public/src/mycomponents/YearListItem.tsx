@@ -14,10 +14,10 @@ export default function ItemsList({ category, placeUUID, items }: { category: st
                 >
 
                         <h2 className="font-semibold text-lg mb-1">
-                            {values.prefix}{values.name} {values.surname}
+                            ปีงบประมาณ {values.year}
                         </h2>
                         <p className="text-muted-foreground text-sm">
-                            ปี {values.year}
+                            {values.prefix}{values.name} {values.surname}
                         </p>
 
                     </Link>

@@ -3,19 +3,18 @@ import Checkbox from "@/components/form/input/Checkbox";
 import Input from "@/components/form/input/InputField";
 import Label from "@/components/form/Label";
 import { EyeCloseIcon, EyeIcon } from "@/icons";
-import { useAuth } from "@/contexts/AuthContext-alternative";
+import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
 import React, { useState } from "react";
-import LoginCredentialsCard from "@/components/auth/LoginCredentialsCard";
 import { useRouter, useSearchParams } from "next/navigation";
 
 export default function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
-  const [isChecked, setIsChecked] = useState(false);
+  const [isChecked, setIsChecked] = useState(true); // Default to true for new users
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const { login, isLoading, user } = useAuth();
+  const { login, isLoading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const nextParam = searchParams?.get("next") || "";
@@ -45,7 +44,7 @@ export default function SignInForm() {
     if (isLoading) return;
 
     try {
-      const success = await login(trimmedUsername, trimmedPassword);
+      const success = await login(trimmedUsername, trimmedPassword, isChecked);
       if (success) {
         // Login successful - get the updated user from context
         // Note: user state should be updated by the login function

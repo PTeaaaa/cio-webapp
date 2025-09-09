@@ -5,6 +5,11 @@ import { PlacesService } from './places.service';
 export class PlacesController {
     constructor(private readonly placesService: PlacesService) {}
 
+    @Get('all')
+    getAllPlaces() {
+        return this.placesService.getAllPlaces();
+    }
+
     @Get('by-id/:id')
     getPlaceById(@Param('id', new ParseUUIDPipe()) id: string) {
         return this.placesService.getPlaceById(id);

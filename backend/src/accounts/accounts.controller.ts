@@ -1,5 +1,5 @@
-import { Controller, DefaultValuePipe, Get, ParseIntPipe, Query } from '@nestjs/common';
-import { AccountsService } from './accounts.service';
+import { Body, Controller, DefaultValuePipe, Get, Param, ParseIntPipe, Put, Query } from '@nestjs/common';
+import { AccountsService, UpdateAccountPayload } from './accounts.service';
 
 @Controller('accounts')
 export class AccountsController {
@@ -13,4 +13,19 @@ export class AccountsController {
     ) {
         return this.accountsService.findAllAccounts(page, limit);
     }
+
+    @Get(':id')
+    async getAccountById(@Param('id') id: string) {
+        return this.accountsService.findAccountById(id);
+    }
+
+    @Put(':id')
+    async updateAccount(
+        @Param('id') id: string,
+        @Body() updateData: UpdateAccountPayload
+    ) {
+        return this.accountsService.updateAccount(id, updateData);
+    }
+
+    
 }

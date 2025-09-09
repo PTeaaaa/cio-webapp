@@ -7,7 +7,7 @@ export const getSidebarItems = async (): Promise<any[]> => {
         });
 
         if (!response.ok) {
-            console.error(`SIDEBAR_API: Failed to fetch sidebar items. Status: ${response.status}`);
+            console.log(`SIDEBAR_API: Failed to fetch sidebar items. Status: ${response.status}`);
             
             // If it's a 401 (unauthorized), return empty array gracefully
             if (response.status === 401) {
@@ -16,7 +16,7 @@ export const getSidebarItems = async (): Promise<any[]> => {
             }
             
             // For other errors, also return empty array but log the error
-            console.error('SIDEBAR_API: Unexpected error status, returning empty array');
+            console.log('SIDEBAR_API: Unexpected error status, returning empty array');
             return [];
         }
 
@@ -24,7 +24,7 @@ export const getSidebarItems = async (): Promise<any[]> => {
         return data;
     }
     catch (error) {
-        console.error("SIDEBAR_API: Error in getSidebarItems:", error);
+        console.log("SIDEBAR_API: Error in getSidebarItems:", error);
         return [];
     }
 };

@@ -1,4 +1,4 @@
-import { Get, Post, Body, Controller, HttpCode, HttpStatus, Req, Res, UnauthorizedException, ValidationPipe } from '@nestjs/common';
+import { Get, Post, Body, Controller, HttpCode, HttpStatus, Req, Res, UnauthorizedException, ValidationPipe, UseGuards } from '@nestjs/common';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
 import { Request } from 'express';
@@ -7,6 +7,7 @@ import { PrismaService } from '@/prisma/prisma.service';
 import { getSessionCookieOpts } from './session/session-cookie';
 import { SignupDto } from './dto/signup.dto';
 import { jwtVerify } from 'jose';
+import { JwtGuard } from './guards/jwt.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -17,16 +18,32 @@ export class AuthController {
     ) { }
 
     @Post('login')
-    async login(@Body() dto: { username: string; password: string }, @Res({ passthrough: true }) res: Response) {
+    async login(@Body() dto: { username: string; password: string; rememberMe?: boolean }, @Res({ passthrough: true }) res: Response) {
 
         try {
-            const result = await this.authService.login(dto.username, dto.password, res);
-
+            const rememberMe = dto.rememberMe !== false; // Default to true if not specified
+            const result = await this.authService.login(dto.username, dto.password, res, rememberMe);
+            
+            // Set access token in secure HTTP-only cookie
+            // If rememberMe is false, don't set maxAge to make it a session cookie
+            const cookieOptions: any = {
+                httpOnly: true,
+                secure: this.configService.get('app.nodeEnv') === 'production',
+                sameSite: 'strict',
+                path: '/',
+            };
+            
+            // Only set maxAge if rememberMe is true
+            if (rememberMe) {
+                cookieOptions.maxAge = 60 * 60 * 1000; // 1 hour (same as JWT expiration)
+            }
+            
+            res.cookie('at', result.accessToken, cookieOptions);
+            
             return { 
                 user: result.user,
-                accessToken: result.accessToken 
+                message: 'Login successful'
             };
-
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : 'Unknown error';
             console.log('LOGIN: Login failed for username:', dto.username, '-', errorMessage);
@@ -36,17 +53,25 @@ export class AuthController {
 
     @Post('logout')
     async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+        
+        // Clear the access token cookie
+        res.clearCookie('at', {
+            httpOnly: true,
+            secure: this.configService.get('app.nodeEnv') === 'production',
+            sameSite: 'strict',
+            path: '/',
+        });
+        
         // Clear the refresh token cookie
-        res.clearCookie(
-            'refreshToken',
-            getSessionCookieOpts(this.configService)
-        );
+        res.clearCookie('rt', {
+            httpOnly: true,
+            secure: this.configService.get('app.nodeEnv') === 'production',
+            sameSite: 'strict',
+            path: '/',
+        });
 
         // Also clear any legacy session cookie if it exists
-        res.clearCookie(
-            'sid',
-            getSessionCookieOpts(this.configService)
-        );
+        res.clearCookie('sid', getSessionCookieOpts(this.configService));
 
         return { ok: true };
     }
@@ -64,61 +89,59 @@ export class AuthController {
     }
 
     @Get('session')
-    async getSession(@Req() req: Request) {
-        const authHeader = req.headers.authorization;
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
-            console.log('SESSION: No authorization header provided');
-            throw new UnauthorizedException('No valid access token provided');
-        }
-
-        const token = authHeader.substring(7); // Remove 'Bearer ' prefix
-        
+    @UseGuards(JwtGuard)
+    async getSession(@Req() req: Request & { user: { id: string; username: string; role: string } }) {
         try {
-            // Validate JWT token and extract user info
-            const secret = new TextEncoder().encode(this.configService.get('JWT_SECRET_KEY'));
-            const { payload } = await jwtVerify(token, secret);
-            
-            // Get user from database based on JWT subject (user ID)
+            // The JWT guard has already validated the token and attached user info to req.user
+            // Get fresh user data from database
             const user = await this.prisma.account.findUnique({
-                where: { id: payload.sub },
+                where: { id: req.user.id },
                 select: { id: true, username: true, role: true },
             });
 
             if (!user) {
-                console.log('SESSION: User not found in database for ID:', payload.sub);
+                console.log('SESSION: User not found in database for ID:', req.user.id);
                 throw new UnauthorizedException('User not found');
             }
 
             return { user };
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-
-            console.log('SESSION: JWT verification failed -', errorMessage);
-
-            console.log('SESSION: Client should use refresh token to get new access token');
-
-            throw new UnauthorizedException('Invalid or expired access token');
+            console.log('SESSION: Error retrieving session -', errorMessage);
+            throw new UnauthorizedException('Session retrieval failed');
         }
     }
 
     @Post('refresh-token')
-    async refreshToken(@Req() req: Request) {
-        const refreshToken = req.cookies?.refreshToken as string | undefined;
-
-        if (!refreshToken) {
+    async refreshToken(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+        const rt = req.cookies?.rt as string | undefined;
+        if (!rt) {
             console.log('REFRESH: No refresh token cookie provided');
             throw new UnauthorizedException('No refresh token');
         }
-        
-        try {
-            const result = await this.authService.refreshToken(refreshToken);
 
-            return result;
+        try {
+            const result = await this.authService.refreshToken(rt);
+            
+            // Use the stored remember me preference from the database
+            const cookieOptions: any = {
+                httpOnly: true,
+                secure: this.configService.get('app.nodeEnv') === 'production',
+                sameSite: 'strict',
+                path: '/',
+            };
+            
+            // Only set maxAge if the original session had rememberMe = true
+            if (result.rememberMe) {
+                cookieOptions.maxAge = 60 * 60 * 1000; // 1 hour
+            }
+            
+            res.cookie('at', result.accessToken, cookieOptions);
+
+            return { message: 'Token refreshed successfully' };
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-
             console.log('REFRESH: Refresh token failed -', errorMessage);
-
             throw error;
         }
     }

@@ -1,5 +1,5 @@
 import { apiFetch } from '../apiFetch/apiFetch';
-import { AccountForm } from '@/types';
+import { AccountForm, UpdateAccountPayload } from '@/types';
 
 interface ApiResponse {
     data: AccountForm[];
@@ -38,6 +38,48 @@ export const getAllAccounts = async (): Promise<AccountForm[] | null> => {
     } catch (error) {
         console.error("Error in getAllAccounts:", error);
         return null;
+    }
+};
+
+export const getAccountById = async (id: string): Promise<AccountForm | null> => {
+    try {
+        const response = await apiFetch(`/accounts/${id}`);
+
+        if (!response.ok) {
+            console.error(`Failed to fetch account. Status: ${response.status}`);
+            return null;
+        }
+
+        const account: AccountForm = await response.json();
+        return account;
+
+    } catch (error) {
+        console.error("Error in getAccountById:", error);
+        return null;
+    }
+};
+
+export const updateAccount = async (id: string, updateData: UpdateAccountPayload): Promise<AccountForm | null> => {
+    try {
+        const response = await apiFetch(`/accounts/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(updateData),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || `Failed to update account. Status: ${response.status}`);
+        }
+
+        const result: AccountForm = await response.json();
+        return result;
+
+    } catch (error) {
+        console.error("Error in updateAccount:", error);
+        throw error;
     }
 };
 

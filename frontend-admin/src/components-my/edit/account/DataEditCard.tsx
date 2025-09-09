@@ -1,5 +1,5 @@
-// ไฟล์: InfoEditCard.tsx
-import React from "react";
+// ไฟล์: DataEditCard.tsx
+import React, { useState, useEffect } from "react";
 import { Modal } from "../../../components/ui/modal";
 import { ConfirmationCard } from "../../../components/ui/modal/ConfirmationCard";
 import Button from "../../../components/ui/button/Button";
@@ -7,6 +7,8 @@ import Input from "../../../components/form/input/InputField";
 import Label from "../../../components/form/Label";
 import { useAccountData } from "@/hooks/accountdataHook/useAccountData";
 import { useAccounts } from "@/contexts/AccountsContext";
+import { getAllPlaces } from "@/services/places/placesAPI";
+import { Place } from "@/types";
 
 export default function DataEditCard() {
     const {
@@ -25,17 +27,69 @@ export default function DataEditCard() {
     } = useAccountData();
 
     const { accountsLoading } = useAccounts();
+    const [places, setPlaces] = useState<Place[]>([]);
+    const [placesLoading, setPlacesLoading] = useState(true);
+
+    // Load places for the dropdown
+    useEffect(() => {
+        const fetchPlaces = async () => {
+            try {
+                setPlacesLoading(true);
+                const placesData = await getAllPlaces();
+                if (placesData) {
+                    setPlaces(placesData);
+                }
+            } catch (error) {
+                console.error("Error fetching places:", error);
+            } finally {
+                setPlacesLoading(false);
+            }
+        };
+
+        fetchPlaces();
+    }, []);
 
     const handleFormSubmit = (event: React.FormEvent) => {
         // This line is the key: it stops the browser from reloading the page.
         event.preventDefault();
     };
 
-    if (accountsLoading) {
+    const formatDateTime = (date: Date | string | undefined) => {
+        if (!date) return "ไม่มีข้อมูล";
+        const d = new Date(date);
+        return d.toLocaleString('th-TH', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+        });
+    };
+
+    const getPlaceNames = (assignedPlaces: any[] | undefined) => {
+        if (!assignedPlaces || assignedPlaces.length === 0) return "ไม่มีสถานที่ที่ได้รับมอบหมาย";
+        return assignedPlaces.map(ap => ap.place.name).join(", ");
+    };
+
+    const handleAssignedPlacesChange = (selectedPlaceIds: string[]) => {
+        handleInputChange('assignedPlaces', selectedPlaceIds);
+    };
+
+    if (accountsLoading || loading) {
         return (
             <div className="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6">
                 <div className="text-center py-8">
                     <p className="text-gray-500 dark:text-gray-400">กำลังโหลดข้อมูล...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (!originalData) {
+        return (
+            <div className="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6">
+                <div className="text-center py-8">
+                    <p className="text-red-500 dark:text-red-400">ไม่พบข้อมูลบัญชี</p>
                 </div>
             </div>
         );
@@ -57,7 +111,7 @@ export default function DataEditCard() {
                                 ID
                             </p>
                             <p className="text-base font-medium text-gray-800 dark:text-white/90">
-                                xxxx-xxxxx-xxxxx-xxxxx-xxxxx-xxxxx
+                                {originalData.id}
                             </p>
                         </div>
 
@@ -66,49 +120,73 @@ export default function DataEditCard() {
                                 Username
                             </p>
                             <p className="text-base font-medium text-gray-800 dark:text-white/90">
-                                นาย
+                                {originalData.username}
                             </p>
                         </div>
+
                         <div>
                             <p className="mb-1 text-sm leading-normal text-gray-500 dark:text-gray-400">
-                                ประเภทของบัญชี <span className="text-green-500">{" *"}</span>
+                                ประเภทของบัญชี
                             </p>
                             <p className="text-base font-medium text-gray-800 dark:text-white/90">
-                                TEST
+                                {originalData.role}
                             </p>
                         </div>
-                        <div>
-                            <p className="mb-1 text-sm leading-normal text-gray-500 dark:text-gray-400">
-                                สถานะของบัญชี
-                            </p>
-                            <p className="text-base font-medium text-gray-800 dark:text-white/90">
-                                TEST
-                            </p>
-                        </div>
+
                         <div>
                             <p className="mb-1 text-sm leading-normal text-gray-500 dark:text-gray-400">
                                 สถานที่ที่ได้รับมอบหมาย
                             </p>
-                            <p className="text-base font-medium text-gray-800 dark:text-white/90 break-words" style={{ whiteSpace: "nowrap" }}>
-                                TEST
+                            <p className="text-base font-medium text-gray-800 dark:text-white/90 break-words">
+                                {getPlaceNames(originalData.assignedPlaces)}
                             </p>
                         </div>
+
                         <div>
                             <p className="mb-1 text-sm leading-normal text-gray-500 dark:text-gray-400">
                                 เวลาที่ล็อกอินล่าสุด
                             </p>
                             <p className="text-base font-medium text-gray-800 dark:text-white/90">
-                                XX:XX
+                                {formatDateTime(originalData.lastLoginAt)}
+                            </p>
+                        </div>
+
+                        <div>
+                            <p className="mb-1 text-sm leading-normal text-gray-500 dark:text-gray-400">
+                                จำนวนครั้งที่พยายามเข้าสู่ระบบ
+                            </p>
+                            <p className="text-base font-medium text-gray-800 dark:text-white/90">
+                                ไม่มีข้อมูล
+                                {/* {originalData.loginAttempts || 0} */}
+                            </p>
+                        </div>
+
+                        <div>
+                            <p className="mb-1 text-sm leading-normal text-gray-500 dark:text-gray-400">
+                                ระงับการเข้าสู่ระบบจนถึง
+                            </p>
+                            <p className="text-base font-medium text-gray-800 dark:text-white/90">
+                                ไม่มีข้อมูล
+                                {/* {formatDateTime(originalData.lockedUntil)} */}
+                            </p>
+                        </div>
+
+                        <div>
+                            <p className="mb-1 text-sm leading-normal text-gray-500 dark:text-gray-400">
+                                เปลี่ยนรหัสผ่านล่าสุดเมื่อ
+                            </p>
+                            <p className="text-base font-medium text-gray-800 dark:text-white/90">
+                                {formatDateTime(originalData.passwordChangedAt)}
                             </p>
                         </div>
 
                         <div className="grid grid-cols-2 gap-21">
                             <div>
                                 <p className="mb-1 text-sm leading-normal text-gray-500 dark:text-gray-400">
-                                    สร้างเมื่อ
+                                    วันที่สร้าง
                                 </p>
                                 <p className="text-base font-medium text-gray-800 dark:text-white/90">
-                                    XX:XX
+                                    {formatDateTime(originalData.createdAt)}
                                 </p>
                             </div>
 
@@ -117,7 +195,7 @@ export default function DataEditCard() {
                                     สร้างโดย
                                 </p>
                                 <p className="text-base font-medium text-gray-800 dark:text-white/90">
-                                    TEST
+                                    {originalData.createdBy || "ไม่มีข้อมูล"}
                                 </p>
                             </div>
                         </div>
@@ -125,27 +203,38 @@ export default function DataEditCard() {
                         <div className="grid grid-cols-2 gap-21">
                             <div>
                                 <p className="mb-1 text-sm leading-normal text-gray-500 dark:text-gray-400">
-                                    เปลี่ยนแปลงล่าสุดเมื่อ
+                                    วันที่อัปเดตล่าสุด
                                 </p>
                                 <p className="text-base font-medium text-gray-800 dark:text-white/90">
-                                    XX:XX
+                                    {formatDateTime(originalData.updatedAt)}
                                 </p>
                             </div>
 
                             <div>
                                 <p className="mb-1 text-sm leading-normal text-gray-500 dark:text-gray-400">
-                                    เปลี่ยนแปลงล่าสุดโดย
+                                    แก้ไขโดย
                                 </p>
                                 <p className="text-base font-medium text-gray-800 dark:text-white/90">
-                                    TEST
+                                    {originalData.modifiedBy || "ไม่มีข้อมูล"}
                                 </p>
                             </div>
+                        </div>
+
+                        <div>
+                            <p className="mb-1 text-sm leading-normal text-gray-500 dark:text-gray-400">
+                                สถานะของบัญชี
+                            </p>
+                            <p className={`text-base font-medium ${originalData.isActive
+                                ? 'text-green-600 dark:text-green-400'
+                                : 'text-red-600 dark:text-red-400'}`}>
+                                {originalData.isActive ? 'ใช้งานได้' : 'ถูกระงับ'}
+                            </p>
                         </div>
 
                         <div className="mt-4">
                             <button
                                 className="flex w-full items-center justify-center gap-2 rounded-full border border-green-600 px-4 py-3 text-sm font-medium text-black shadow-theme-xs hover:bg-green-600 dark:border-green-700 dark:text-white dark:hover:bg-green-700 dark:hover:text-gray-200 lg:inline-flex lg:w-auto duration-200 ease-in-out"
-                                onClick={() => {}}
+                                onClick={() => { }}
                             >
                                 เปลี่ยนรหัสผ่านของบัญชีนี้
                             </button>
@@ -188,75 +277,89 @@ export default function DataEditCard() {
                 <div className="no-scrollbar relative w-full max-w-[700px] overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-11">
                     <div className="px-2 pr-14">
                         <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
-                            แก้ไขข้อมูลส่วนตัว
+                            แก้ไขข้อมูลบัญชี
                         </h4>
                         <p className="mb-6 text-sm text-gray-500 dark:text-gray-400 lg:mb-7">
-                            อัปเดตรายละเอียดของคุณเพื่อให้โปรไฟล์ของคุณเป็นปัจจุบัน
+                            อัปเดตข้อมูลบัญชีให้เป็นปัจจุบัน
                         </p>
                     </div>
                     <form className="flex flex-col" onSubmit={handleFormSubmit}>
                         <div className="custom-scrollbar h-[450px] overflow-y-auto px-2 pb-3">
-                            <div className="mt-7">
-                                <h5 className="mb-5 text-lg font-medium text-gray-800 dark:text-white/90 lg:mb-6">
-                                    ข้อมูลส่วนตัว
-                                </h5>
+                            <div className="mt-7 space-y-4">
 
-                                <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
-
-                                    <div className="col-span-2 w-[50%]">
-                                        <Label>คำนำหน้า</Label>
-                                        <Input
-                                            type="text"
-                                            defaultValue={formData.prefix || ""}
-                                            onChange={(e) => handleInputChange('prefix', e.target.value)}
-                                        />
-                                    </div>
-
-                                    <div className="col-span-2 lg:col-span-1">
-                                        <Label>ชื่อ</Label>
-                                        <Input
-                                            type="text"
-                                            defaultValue={formData.name || ""}
-                                            onChange={(e) => handleInputChange('name', e.target.value)}
-                                        />
-                                    </div>
-
-                                    <div className="col-span-2 lg:col-span-1">
-                                        <Label>นามสกุล</Label>
-                                        <Input
-                                            type="text"
-                                            defaultValue={formData.surname || ""}
-                                            onChange={(e) => handleInputChange('surname', e.target.value)}
-                                        />
-                                    </div>
-
-                                    <div className="col-span-2 lg:col-span-1">
-                                        <Label>อีเมล</Label>
-                                        <Input
-                                            type="email"
-                                            defaultValue={formData.email || ""}
-                                            onChange={(e) => handleInputChange('email', e.target.value)}
-                                        />
-                                    </div>
-
-                                    <div className="col-span-2 lg:col-span-1">
-                                        <Label>เบอร์โทรศัพท์</Label>
-                                        <Input
-                                            type="text"
-                                            defaultValue={formData.phone || ""}
-                                            onChange={(e) => handleInputChange('phone', e.target.value)}
-                                        />
-                                    </div>
-
-                                    <div className="col-span-2">
-                                        <Label>ตำแหน่งตามหน่วยงานที่สังกัด</Label>
-                                        <Input
-                                            type="text"
-                                            defaultValue={formData.position || ""}
-                                            onChange={(e) => handleInputChange('position', e.target.value)}
-                                        />
-                                    </div>
+                                {/* Username */}
+                                <div>
+                                    <Label htmlFor="username">ชื่อผู้ใช้</Label>
+                                    <Input
+                                        id="username"
+                                        type="text"
+                                        defaultValue={formData.username || ""}
+                                        onChange={(e) => handleInputChange('username', e.target.value)}
+                                        placeholder="กรอกชื่อผู้ใช้"
+                                    />
                                 </div>
+
+                                {/* Role */}
+                                <div>
+                                    <Label htmlFor="role">บทบาท</Label>
+                                    <select
+                                        id="role"
+                                        value={formData.role || ""}
+                                        onChange={(e) => handleInputChange('role', e.target.value)}
+                                        className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                                    >
+                                        <option value="">เลือกบทบาท</option>
+                                        <option value="admin">ผู้ดูแลระบบ</option>
+                                        <option value="user">ผู้ใช้ทั่วไป</option>
+                                        <option value="moderator">ผู้ดูแล</option>
+                                    </select>
+                                </div>
+
+                                {/* Account Status */}
+                                <div>
+                                    <Label htmlFor="isActive">สถานะบัญชี</Label>
+                                    <select
+                                        id="isActive"
+                                        value={formData.isActive?.toString() || "true"}
+                                        onChange={(e) => handleInputChange('isActive', e.target.value === 'true')}
+                                        className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                                    >
+                                        <option value="true">ใช้งานได้</option>
+                                        <option value="false">ถูกระงับ</option>
+                                    </select>
+                                </div>
+
+                                {/* Assigned Places */}
+                                <div>
+                                    <Label htmlFor="assignedPlaces">สถานที่ที่ได้รับมอบหมาย</Label>
+                                    {placesLoading ? (
+                                        <p className="text-sm text-gray-500">กำลังโหลดสถานที่...</p>
+                                    ) : (
+                                        <div className="border border-gray-300 rounded-lg p-3 max-h-40 overflow-y-auto dark:border-gray-600">
+                                            {places.map((place) => (
+                                                <label key={place.id} className="flex items-center space-x-2 mb-2">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={formData.assignedPlaces?.includes(place.id) || false}
+                                                        onChange={(e) => {
+                                                            const currentPlaces = formData.assignedPlaces || [];
+                                                            if (e.target.checked) {
+                                                                handleAssignedPlacesChange([...currentPlaces, place.id]);
+                                                            } else {
+                                                                handleAssignedPlacesChange(currentPlaces.filter(id => id !== place.id));
+                                                            }
+                                                        }}
+                                                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700"
+                                                    />
+                                                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                                                        {place.name} ({place.agency})
+                                                    </span>
+                                                </label>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+
                             </div>
                         </div>
                         <div className="flex items-center gap-3 px-2 mt-6 lg:justify-end">

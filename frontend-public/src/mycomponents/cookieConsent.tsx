@@ -7,8 +7,11 @@ import { Card, CardContent } from "@/components/card"
 
 export default function CookieConsent() {
   const [visible, setVisible] = useState(false)
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
+    setMounted(true)
+    
     // For test cookie
     // Cookies.remove("cookie_consent")
 
@@ -23,7 +26,8 @@ export default function CookieConsent() {
     setVisible(false)
   }
 
-  if (!visible) return null
+  // Don't render anything until component is mounted on client
+  if (!mounted || !visible) return null
 
   return (
     <div className="fixed bottom-4 left-4 right-4 z-50 flex justify-end">

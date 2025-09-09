@@ -1,7 +1,9 @@
-import { Controller, Get, Post, Put, Delete, Body, Query, Param, UseGuards, Req, ParseUUIDPipe, ValidationPipe, DefaultValuePipe, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Query, Param, UseGuards, Req, ParseUUIDPipe, ValidationPipe, DefaultValuePipe, ParseIntPipe, UseInterceptors, UploadedFile, BadRequestException } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { Request } from 'express';
+
 import { PeopleService } from './people.service';
 import { JwtGuard } from '@/auth/guards/jwt.guard';
-import { Request } from 'express';
 import { SessionUser } from '@/auth/auth.service';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
@@ -9,13 +11,16 @@ import { Role } from 'src/auth/enums/roles.enum';
 import { CreatePersonDto } from './dto/create-person.dto';
 import { UpdatePersonDto } from './dto/update-person.dto';
 
+
 interface RequestWithuser extends Request {
     user: SessionUser;
 }
 
 @Controller('people')
 export class PeopleController {
-    constructor(private readonly peopleService: PeopleService) { }
+    constructor(
+        private readonly peopleService: PeopleService,
+    ) { }
 
     @Post('createpeople')
     @UseGuards(JwtGuard, RolesGuard)
@@ -58,6 +63,24 @@ export class PeopleController {
         @Body(new ValidationPipe()) updatePersonDto: UpdatePersonDto,
     ) {
         return this.peopleService.updatePerson(req.user, personId, updatePersonDto);
+    }
+
+    @Post(':entityId/upload-image')
+    @UseInterceptors(FileInterceptor('image')) // 'image' คือชื่อ field ใน FormData ที่จะใช้ส่งไฟล์
+    async uploadFile(
+        @UploadedFile() file: Express.Multer.File,
+        @Param('entityId', ParseUUIDPipe) entityId: string, // ตรวจสอบว่าเป็น UUID ที่ถูกต้อง
+    ) {
+        if (!file) {
+            throw new BadRequestException('No file provided.');
+        }
+
+        const imageUrl = await this.peopleService.uploadPersonImage(file, entityId);
+
+        return {
+            message: 'Image uploaded successfully',
+            imageUrl: imageUrl,
+        };
     }
 
     @Delete('deletepeople/:id')

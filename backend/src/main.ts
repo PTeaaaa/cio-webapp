@@ -9,7 +9,7 @@ import cookieParser from 'cookie-parser';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
-  const port = configService.get<number>('PORT') || 3003;
+  const port = configService.get<number>('app.port') || 3003;
 
   const expressApp = app.getHttpAdapter().getInstance();
   expressApp.use(express.json({ limit: '50mb' }));
@@ -19,7 +19,7 @@ async function bootstrap() {
   app.use(cookieParser());
 
   app.enableCors({
-    origin: [configService.get('FRONTEND_URL_MAIN'), configService.get('FRONTEND_URL_ADMIN')],
+    origin: [configService.get('app.frontendUrlMain'), configService.get('app.frontendUrlAdmin')],
     credentials: true,
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],

@@ -1,8 +1,8 @@
 "use client";
 
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import { AccountForm } from "@/types";
-import { getAllAccounts, createAccount, SignupPayload } from '@/services/accounts/accountAPI';
+import { AccountForm, UpdateAccountPayload } from "@/types";
+import { getAllAccounts, createAccount, SignupPayload, getAccountById, updateAccount } from '@/services/accounts/accountAPI';
 
 interface AuthContextType {
     accounts: AccountForm[];
@@ -10,6 +10,8 @@ interface AuthContextType {
     accountsError: string | null;
     refreshAccounts: () => Promise<void>;
     signUp: (payload: SignupPayload) => Promise<{ success: boolean; error?: string }>;
+    getAccount: (id: string) => Promise<AccountForm | null>;
+    updateAccountData: (id: string, payload: UpdateAccountPayload) => Promise<{ success: boolean; error?: string }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -65,6 +67,39 @@ export function AccountsProvider({ children }: { children: React.ReactNode }) {
         }
     };
 
+    const getAccount = async (id: string): Promise<AccountForm | null> => {
+        try {
+            const account = await getAccountById(id);
+            return account;
+        } catch (err) {
+            console.error("Error fetching account:", err);
+            return null;
+        }
+    };
+
+    const updateAccountData = async (id: string, payload: UpdateAccountPayload): Promise<{ success: boolean; error?: string }> => {
+        try {
+            setAccountsError(null);
+            const result = await updateAccount(id, payload);
+            
+            if (result) {
+                // Update the account in the local state
+                setAccounts(prevAccounts => 
+                    prevAccounts.map(account => 
+                        account.id === id ? result : account
+                    )
+                );
+                return { success: true };
+            } else {
+                return { success: false, error: "Failed to update account" };
+            }
+        } catch (err: any) {
+            const errorMessage = err.message || "Failed to update account";
+            setAccountsError(errorMessage);
+            return { success: false, error: errorMessage };
+        }
+    };
+
     const signUp = async (payload: SignupPayload): Promise<{ success: boolean; error?: string }> => {
         try {
             setAccountsError(null);
@@ -86,7 +121,9 @@ export function AccountsProvider({ children }: { children: React.ReactNode }) {
         accountsLoading, 
         accountsError,
         refreshAccounts,
-        signUp
+        signUp,
+        getAccount,
+        updateAccountData
     }), [accounts, accountsLoading, accountsError]);
 
     if (accountsLoading) {

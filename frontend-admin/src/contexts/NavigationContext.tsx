@@ -2,7 +2,7 @@
 
 "use client";
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { useAuth } from "@/contexts/AuthContext-alternative";
+import { useAuth } from "@/contexts/AuthContext";
 import { getSidebarItems } from "@/services/sidebars/sidebarAPI";
 import jsonNavItems from "@/items/sidebarjson/jsonNavItems.json";
 
@@ -67,7 +67,7 @@ const filterNavigationByRole = (navItems: NavItem[], userRole: string | undefine
 };
 
 export const NavigationProvider = ({ children }: { children: React.ReactNode }) => {
-    const { user, isLoading: authLoading } = useAuth();
+    const { user, isLoading: authLoading, isLoggingOut } = useAuth();
     const [filteredNavigation, setFilteredNavigation] = useState<FilteredNavigation>({
         navItems: [],
     });
@@ -75,7 +75,14 @@ export const NavigationProvider = ({ children }: { children: React.ReactNode }) 
 
     useEffect(() => {
         const fetchAndSetSidebarItems = async () => {
-            console.log('NavigationContext: Starting fetchAndSetSidebarItems', { user, authLoading });
+            console.log('NavigationContext: Starting fetchAndSetSidebarItems', { user, authLoading, isLoggingOut });
+            
+            // Don't fetch during logout process
+            if (isLoggingOut) {
+                console.log('NavigationContext: Logout in progress, skipping navigation fetch');
+                setIsLoading(false);
+                return;
+            }
             
             // Wait for auth to finish loading
             if (authLoading) {
@@ -170,7 +177,7 @@ export const NavigationProvider = ({ children }: { children: React.ReactNode }) 
         };
 
         fetchAndSetSidebarItems();
-    }, [user, authLoading]);
+    }, [user, authLoading, isLoggingOut]);
 
     return (
         <NavigationContext.Provider value={{ filteredNavigation, isLoading }}>

@@ -63,7 +63,7 @@ export default async function PersonPage({ params }: PageProps) {
     const breadcrumbItems = [
         { label: mainCategoryName, href: `/${mainCategory}` },
         { label: placeName, href: `/${mainCategory}/${placeUUID}` },
-        { label: `ปี ${personYear}`, href: '' },
+        { label: `ปีงบประมาณ ${personYear}`, href: '' },
     ];
 
     try {

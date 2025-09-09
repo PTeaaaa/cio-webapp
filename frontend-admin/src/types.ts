@@ -35,6 +35,7 @@ export type UpdatePersonPayload = Partial<Omit<PersonForm, "id">>;
 export interface Place {
     id: string;
     name: string;
+    agency: string;
 }
 
 export type User = {
@@ -42,6 +43,7 @@ export type User = {
     username?: string;
     role?: string;
     assignedPlaces?: any;
+    rememberMe?: boolean;
 };
 
 export type QueueItem = {
@@ -60,4 +62,23 @@ export interface AccountForm {
     modifiedBy: string;
     updatedAt: Date;
     isActive: boolean;
+    assignedPlaces?: AccountPlace[];
+}
+
+export interface AccountPlace {
+    id: number;
+    accountId: string;
+    placeId: string;
+    place: {
+        id: string;
+        name: string;
+        agency: string;
+    };
+}
+
+export interface UpdateAccountPayload {
+    username?: string;
+    role?: string;
+    isActive?: boolean;
+    assignedPlaces?: string[];
 }

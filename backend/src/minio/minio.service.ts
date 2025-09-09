@@ -10,12 +10,12 @@ export class MinioService {
     private readonly logger = new Logger(MinioService.name);
 
     constructor(private readonly configService: ConfigService) {
-        const endPoint = this.configService.getOrThrow<string>('MINIO_ENDPOINT');
-        const port = this.configService.getOrThrow<number>('MINIO_PORT');
-        const accessKey = this.configService.getOrThrow<string>('MINIO_ACCESS_KEY');
-        const secretKey = this.configService.getOrThrow<string>('MINIO_SECRET_KEY');
-        const useSSL = this.configService.get<string>('MINIO_USE_SSL') === 'true'; // แปลง string เป็น boolean
-        this.bucketName = this.configService.getOrThrow<string>('MINIO_BUCKET_NAME');
+        const endPoint = this.configService.getOrThrow<string>('minio.endpoint');
+        const port = this.configService.getOrThrow<number>('minio.port');
+        const accessKey = this.configService.getOrThrow<string>('minio.accessKey');
+        const secretKey = this.configService.getOrThrow<string>('minio.secretKey');
+        const useSSL = this.configService.get<boolean>('minio.useSsl'); // Already converted to boolean in config
+        this.bucketName = this.configService.getOrThrow<string>('minio.bucketName');
 
         // ตรวจสอบว่าค่าที่จำเป็นมีอยู่ครบถ้วนหรือไม่
         if (!endPoint || !port || !accessKey || !secretKey || !this.bucketName) {
@@ -78,9 +78,9 @@ export class MinioService {
 
             // สร้าง URL สำหรับเข้าถึงไฟล์
             // สำหรับ MinIO ที่รัน Local, URL จะเป็น http://localhost:PORT/BUCKET_NAME/FILE_NAME
-            const minioEndpoint = this.configService.get<string>('MINIO_ENDPOINT');
-            const minioPort = this.configService.get<number>('MINIO_PORT');
-            const protocol = this.configService.get<string>('MINIO_USE_SSL') === 'true' ? 'https' : 'http';
+            const minioEndpoint = this.configService.get<string>('minio.endpoint');
+            const minioPort = this.configService.get<number>('minio.port');
+            const protocol = this.configService.get<boolean>('minio.useSsl') ? 'https' : 'http';
 
             return `${protocol}://${minioEndpoint}:${minioPort}/${this.bucketName}/${fileName}`;
 

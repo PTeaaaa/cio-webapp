@@ -13,18 +13,16 @@ export class JwtGuard implements CanActivate {
 
   async canActivate(ctx: ExecutionContext): Promise<boolean> {
     const req = ctx.switchToHttp().getRequest<Request>();
-    const authHeader = req.headers.authorization;
+    const token = req.cookies?.at as string | undefined;
     
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      console.log('JWT_GUARD: No authorization header provided');
+    if (!token) {
+      console.log('JWT_GUARD: No access token cookie provided');
       throw new UnauthorizedException('No valid access token provided');
     }
-
-    const token = authHeader.substring(7); // Remove 'Bearer ' prefix
     
     try {
       // Validate JWT token and extract user info
-      const secret = new TextEncoder().encode(this.configService.get('JWT_SECRET_KEY'));
+      const secret = new TextEncoder().encode(this.configService.get('jwt.secretKey'));
       const { payload } = await jwtVerify(token, secret);
       
       // Get user from database based on JWT subject (user ID)
@@ -42,9 +40,7 @@ export class JwtGuard implements CanActivate {
       (req as any).user = user;
       
       return true;
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      console.log('JWT_GUARD: JWT verification failed -', errorMessage);
+    } catch {
       throw new UnauthorizedException('Invalid or expired access token');
     }
   }

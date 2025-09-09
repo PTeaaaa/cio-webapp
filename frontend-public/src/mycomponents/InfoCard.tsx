@@ -12,7 +12,7 @@ export default function InfoCard({ personForm }: { personForm: PersonForm }) {
                     <div className="w-full flex flex-col items-center lg:items-start">
 
                         <p className="text-gray-600 mb-4 md:mb-6 text-sm md:text-base text-center lg:text-left">
-                            ข้อมูลผู้บริหารเทคโนโลยีสารสนเทศระดับสูง
+                            ข้อมูลผู้บริหารเทคโนโลยีสารสนเทศระดับสูงปีงบประมาณ {personForm.year || ""}
                         </p>
 
                         <h1 className="text-2xl md:text-4xl font-bold mb-4 md:mb-10 text-center lg:text-left">

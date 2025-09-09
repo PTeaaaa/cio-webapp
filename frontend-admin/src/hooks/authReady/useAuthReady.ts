@@ -1,15 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useAuth } from "@/contexts/AuthContext-alternative";
+import { useAuth } from "@/contexts/AuthContext";
 
 export function useAuthReady() {
-    const { user, isLoading } = useAuth();
+    const { user, isLoading, isLoggingOut } = useAuth();
     const [ ready, setReady ] = useState(false);
 
     useEffect(() => {
-        if (!isLoading) setReady(true);
-    }, [isLoading]);
+        // Only mark as ready when not loading and not logging out
+        if (!isLoading && !isLoggingOut) {
+            setReady(true);
+        } else {
+            setReady(false);
+        }
+    }, [isLoading, isLoggingOut]);
 
-    return { user, ready, isLoading };
+    return { user, ready, isLoading, isLoggingOut };
 }
