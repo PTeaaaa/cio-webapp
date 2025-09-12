@@ -52,6 +52,21 @@ export class PlacesService {
         try {
             const skip = (page - 1) * limit;
 
+            // First, check if any places exist for this agency (without pagination)
+            const agencyExists = await this.prisma.place.findFirst({
+                where: {
+                    agency: agency,
+                },
+                select: {
+                    id: true,
+                }
+            });
+
+            // If no places found for this agency, throw NotFoundException
+            if (!agencyExists) {
+                throw new NotFoundException(`No places found for agency: ${agency}. Agency may not exist or has no places.`);
+            }
+
             const [places, total] = await this.prisma.$transaction([
                 this.prisma.place.findMany({
                     where: {
@@ -81,6 +96,11 @@ export class PlacesService {
             };
 
         } catch (error: unknown) {
+            // Re-throw NotFoundException as-is
+            if (error instanceof NotFoundException) {
+                throw error;
+            }
+            
             const errorMessage = error instanceof Error ? error.message : String(error);
             throw new InternalServerErrorException(`Failed to fetch places by agency: ${errorMessage}`);
         }

@@ -14,8 +14,8 @@ export default function Breadcrumbs() {
     ];
 
     return (
-        <div className="ml-[30px] lg:ml-[190px] pt-[50px]">
-            <nav className="bg-white border border-gray-200 rounded-full px-4 py-2 w-fit hover:border-gray-400 transition-all duration-300" aria-label="Breadcrumb">
+        <>
+            <nav className="bg-white border border-gray-200 rounded-full px-4 py-1 w-fit hover:border-gray-400 transition-all duration-300" aria-label="Breadcrumb">
                 <ol className="flex flex-wrap items-center">
                     {allBreadcrumbs.map((item, index) => (
                         <li key={item.href} className="flex items-center">
@@ -49,6 +49,6 @@ export default function Breadcrumbs() {
                     ))}
                 </ol>
             </nav>
-        </div>
+        </>
     );
 }

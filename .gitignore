@@ -13,6 +13,8 @@ dist/
 
 # Node.js dependencies
 node_modules/
+**/node_modules
+**/package-lock.json
 
 # Miscellaneous
 photoExample/

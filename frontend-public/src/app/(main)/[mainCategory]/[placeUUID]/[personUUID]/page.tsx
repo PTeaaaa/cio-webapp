@@ -85,7 +85,7 @@ export default async function PersonPage({ params }: PageProps) {
     return (
         <>
             <BreadcrumbUpdater breadcrumbItems={breadcrumbItems} />
-            <InfoCard personForm={personData as PersonForm} />;
+            <InfoCard personForm={personData as PersonForm} />
         </>
     )
 }

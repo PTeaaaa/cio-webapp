@@ -12,11 +12,11 @@ if (!BACKEND_URL) {
  * @param agency ชื่อหน่วยงานที่ต้องการค้นหา
  * @returns Promise ที่ resolve ด้วย Array ของ PlaceForm objects หรือ null หากไม่พบ
  */
-export const getPlacesByAgency = async (agency: string, page: number, limit: number): Promise<PlacesResponse | null> => {
-    // หาก agency ไม่มีค่า, คืนค่า null ทันที
+export const getPlacesByAgency = async (agency: string, page: number, limit: number): Promise<PlacesResponse> => {
+    // หาก agency ไม่มีค่า, throw error
     if (!agency) {
         console.warn("getPlacesByAgency: agency is missing.");
-        return null;
+        throw new Error("AGENCY_MISSING: Agency parameter is required");
     }
 
     try {
@@ -30,8 +30,9 @@ export const getPlacesByAgency = async (agency: string, page: number, limit: num
         if (!response.ok) {
 
             if (response.status === 404) {
-                console.log(`No places found for agency: ${agency} (404).`);
-                return null;
+                console.log(`Agency not found: ${agency} (404).`);
+                // For 404, throw a specific error instead of returning null
+                throw new Error(`AGENCY_NOT_FOUND: ${agency}`);
             }
 
             const errorBody = await response.text(); // อ่านเป็น text ก่อนเพื่อ debug

@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Prompt } from "next/font/google";
 import "@/app/globals.css";
 import Header from "@/mycomponents/Header";
-import DirectoryBar from "@/mycomponents/DirectoryBar";
+import { SidebarProvider, SidebarTrigger } from "@/components/sidebar";
 import Footer from "@/mycomponents/Footer";
 import CookieConsent from "@/mycomponents/cookieConsent";
 import NavHori from "@/mycomponents/navbar-hori";
 import { BreadcrumbProvider } from "@/context/BreadcrumbContext";
 import Breadcrumbs from "@/mycomponents/breadcrumbs";
+import { AppSidebar } from "@/components/app-sidebar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -39,27 +40,42 @@ export default function RootLayout({ children, }: Readonly<{
     <html lang="en">
       <body className={`flex flex-col min-h-lvh antialiased bg-[#ededed] ${geistSans.variable} ${geistMono.variable} ${prompt.variable}`}>
         <Header />
-        <BreadcrumbProvider>
-          <div className="flex-grow flex flex-col relative">
-            <div className="flex items-center gap-2 px-4 lg:hidden">
-              <div className="mt-[50px]">
-              </div>
-              <Breadcrumbs />
-            </div>
+      <SidebarProvider>
+          <BreadcrumbProvider>
+            <div className="flex-grow flex flex-col relative">
 
-            <div className="hidden lg:block">
-              <div className="pt-[70px]">
-                <NavHori />
+              <div className="hidden lg:block">
+                <div className="pt-[70px]">
+                  <NavHori />
+                </div>
               </div>
-              <Breadcrumbs />
-            </div>
 
-            <main className="flex-grow pb-8">
-              {children}
-              <CookieConsent />
-            </main>
-          </div>
-        </BreadcrumbProvider>
+              <span className="lg:hidden mt-[30px] flex justify-end">
+                <SidebarTrigger />
+                <AppSidebar />
+              </span>
+
+              <div className="flex flex-col items-center py-4">
+                {/* Wrapper container for both objects */}
+                <div className="w-full">
+                  {/* Object 1 - Breadcrumbs */}
+                  <div className="flex justify-center lg:mt-[30px]">
+                    <Breadcrumbs />
+                  </div>
+
+                  {/* Object 2 - Main content card */}
+                  <main>
+                    <div className="flex-grow justify-center">
+                      {children}
+                    </div>
+                    <CookieConsent />
+                  </main>
+                </div>
+              </div>
+
+            </div>
+          </BreadcrumbProvider>
+        </SidebarProvider>
         <Footer />
       </body>
     </html>
