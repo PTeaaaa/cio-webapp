@@ -39,3 +39,8 @@ export interface PeopleResponse {
     data: PersonForm[];
     meta: PaginationMeta;
 }
+
+export type PlaceSearchResult = {
+    value: string;
+    label: string;
+};

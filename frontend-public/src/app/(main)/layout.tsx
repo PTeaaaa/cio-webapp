@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Prompt } from "next/font/google";
 import "@/app/globals.css";
-import Header from "@/mycomponents/Header";
+import Header from "@/components/mycomponents/Header";
 import { SidebarProvider, SidebarTrigger } from "@/components/sidebar";
-import Footer from "@/mycomponents/Footer";
-import CookieConsent from "@/mycomponents/cookieConsent";
-import NavHori from "@/mycomponents/navbar-hori";
+import Footer from "@/components/mycomponents/Footer";
+import CookieConsent from "@/components/mycomponents/cookieConsent";
+import NavHori from "@/components/mycomponents/navbar-hori";
 import { BreadcrumbProvider } from "@/context/BreadcrumbContext";
-import Breadcrumbs from "@/mycomponents/breadcrumbs";
+import Breadcrumbs from "@/components/mycomponents/breadcrumbs";
 import { AppSidebar } from "@/components/app-sidebar";
+import MSWProvider from "../_msw-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,10 +38,10 @@ export default function RootLayout({ children, }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning={false}>
       <body className={`flex flex-col min-h-lvh antialiased bg-[#ededed] ${geistSans.variable} ${geistMono.variable} ${prompt.variable}`}>
         <Header />
-      <SidebarProvider>
+        <SidebarProvider>
           <BreadcrumbProvider>
             <div className="flex-grow flex flex-col relative">
 
@@ -66,7 +67,9 @@ export default function RootLayout({ children, }: Readonly<{
                   {/* Object 2 - Main content card */}
                   <main>
                     <div className="flex-grow justify-center">
-                      {children}
+                      <MSWProvider>
+                        {children}
+                      </MSWProvider>
                     </div>
                     <CookieConsent />
                   </main>

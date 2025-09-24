@@ -1,10 +1,13 @@
 import { PlaceForm, PlacesResponse } from "@/types";
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_NESTJS_API_URL;
+// Type for search results that matches the combobox expectations
+export type PlaceSearchResult = {
+    value: string;
+    label: string;
+};
 
-if (!BACKEND_URL) {
-  console.warn("NEXT_PUBLIC_NESTJS_API_URL is not defined in Server Component context.");
-}
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3003';
+
 
 /**
  * ดึงข้อมูล Place ทั้งหมดที่ตรงกับ agency ที่ระบุ
@@ -84,7 +87,7 @@ export const getPlaceByID = async (placeUUID: string): Promise<PlaceForm | null>
     }
     catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : String(error);
-        console.error(`Error in getPlacesByAgency for agency ${placeUUID}:`, errorMessage);
+        console.error(`Error in getPlaceByID for agency ${placeUUID}:`, errorMessage);
         throw new Error(`Failed to fetch places data: ${errorMessage}`);
     }
 };

@@ -6,7 +6,7 @@ const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
 const appConfig = registerAs('app', () => ({
   nodeEnv: process.env.NODE_ENV || 'development',
   port: parseInt(process.env.PORT!, 10) || 3003,
-  frontendUrlMain: process.env.FRONTEND_URL_MAIN || 'http://localhost:3000',
+  frontendUrlPublic: process.env.FRONTEND_URL_PUBLIC || 'http://localhost:3000',
   frontendUrlAdmin: process.env.FRONTEND_URL_ADMIN || 'http://localhost:3002',
 }));
 

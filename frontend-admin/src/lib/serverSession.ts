@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers';
 
-const BASE = (process.env.NEXT_PUBLIC_NESTJS_API_URL ?? "").replace(/\/+$/, "");
+const BASE = (process.env.NEXT_PUBLIC_BACKEND_URL ?? "").replace(/\/+$/, "");
 
 export async function getServerSessionUser(): Promise<{ user: any } | null> {
 

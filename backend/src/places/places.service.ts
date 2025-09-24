@@ -1,6 +1,5 @@
 import { Injectable, NotFoundException, BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class PlacesService {
@@ -100,7 +99,7 @@ export class PlacesService {
             if (error instanceof NotFoundException) {
                 throw error;
             }
-            
+
             const errorMessage = error instanceof Error ? error.message : String(error);
             throw new InternalServerErrorException(`Failed to fetch places by agency: ${errorMessage}`);
         }

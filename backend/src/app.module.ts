@@ -12,6 +12,7 @@ import { MinioModule } from './minio/minio.module';
 import { UploadService } from './upload/upload.service';
 import { UploadModule } from './upload/upload.module';
 import { AccountsModule } from './accounts/accounts.module';
+import { SearchModule } from './search/search.module';
 import * as Joi from 'joi';
 import configuration from './config/configuration';
 
@@ -28,7 +29,7 @@ import configuration from './config/configuration';
 
         SESSION_EXPIRES_IN: Joi.string().pattern(/^\d+[smhd]$/).default("7d"),
 
-        FRONTEND_URL_MAIN: Joi.string().uri().required(),
+        FRONTEND_URL_PUBLIC: Joi.string().uri().required(),
         FRONTEND_URL_ADMIN: Joi.string().uri().required(),
 
         COOKIE_SECURE: Joi.boolean().default(true),
@@ -48,6 +49,7 @@ import configuration from './config/configuration';
     MinioModule,
     UploadModule,
     AccountsModule,
+    SearchModule,
   ],
   controllers: [AppController],
   providers: [AppService, UploadService],

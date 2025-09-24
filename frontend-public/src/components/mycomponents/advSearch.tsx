@@ -64,12 +64,10 @@ const formFields: FormFieldProps[] = [
 ];
 
 // Client component for form logic
-export default function AdvancedSearch({ baseURL }: { baseURL: string }) {
+export default function AdvancedSearch() {
     const { register, handleSubmit } = useForm<SearchFormData>();
     const onSubmit: SubmitHandler<SearchFormData> = (data) => {
         console.log("Form data:", data);
-        // Example: Send data to API using baseURL
-        // fetch(`${baseURL}/api/search`, { method: "POST", body: JSON.stringify(data) });
     };
 
     return (

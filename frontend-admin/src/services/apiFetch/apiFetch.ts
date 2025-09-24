@@ -7,7 +7,7 @@ export type ApiFetchOptions = Omit<RequestInit, 'headers' | 'credentials'> & {
   skipAuth?: boolean; // Skip automatic JWT token attachment for public endpoints
 };
 
-const API_BASE = (process.env.NEXT_PUBLIC_NESTJS_API_URL ?? '').replace(/\/+$/, '');
+const API_BASE = (process.env.NEXT_PUBLIC_BACKEND_URL ?? '').replace(/\/+$/, '');
 
 // Endpoints that don't need authentication
 const PUBLIC_ENDPOINTS = ['/auth/login', '/auth/signup', '/auth/refresh-token'];
