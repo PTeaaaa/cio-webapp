@@ -21,8 +21,6 @@ export const searchPlacesByName = async (
         // Build URL with agency parameter if provided
         let url = `${BACKEND_URL}/search/places?name=${encodeURIComponent(trimmedSearchTerm)}&limit=${limit}&offset=${offset}`;
 
-        // let url = `${BACKEND_URL}/places/search-by-name?name=${encodeURIComponent(trimmedSearchTerm)}&limit=${limit}&offset=${offset}`;
-
         if (agency && agency.trim() !== '') {
             url += `&agency=${encodeURIComponent(agency.trim())}`;
         }
@@ -74,6 +72,73 @@ export const searchPlacesByName = async (
 
         // Return empty array on error instead of fallback results
         console.log("Returning empty search results due to error.");
+        return [];
+    }
+};
+
+export const getInitialPlaces = async (
+    limit: number = 10,
+    offset: number = 0,
+    agency?: string
+): Promise<PlaceSearchResult[]> => {
+    try {
+        // Build URL with agency parameter if provided
+        let url = `${BACKEND_URL}/places?limit=${limit}&offset=${offset}`;
+
+        if (agency && agency.trim() !== '') {
+            url = `${BACKEND_URL}/places/by-agency/${encodeURIComponent(agency.trim())}?page=${Math.floor(offset / limit) + 1}&limit=${limit}`;
+        }
+
+        console.log('getInitialPlaces - Making request to:', url);
+        console.log('getInitialPlaces - Parameters:', { agency, limit, offset });
+
+        const response = await fetch(url, {
+            method: 'GET',
+            signal: AbortSignal.timeout(5000), // 5 second timeout
+        });
+
+        console.log('getInitialPlaces - Response status:', response.status, response.statusText);
+
+        if (!response.ok) {
+            if (response.status === 404) {
+                console.log(`No initial places found (404).`);
+                return [];
+            }
+
+            const errorBody = await response.text();
+            console.error(`Error fetching initial places. Status: ${response.status}. Body: ${errorBody.substring(0, 100)}`);
+            throw new Error(`Failed to fetch initial places with status ${response.status}`);
+        }
+
+        // Handle different response formats based on endpoint
+        let backendResults: PlaceForm[] = [];
+        
+        if (agency && agency.trim() !== '') {
+            // Agency-specific endpoint returns PlacesResponse format
+            const placesResponse = await response.json();
+            backendResults = Array.isArray(placesResponse.places) ? placesResponse.places : [];
+        } else {
+            // General places endpoint returns PlaceForm[] directly
+            const results = await response.json();
+            backendResults = Array.isArray(results) ? results : [];
+        }
+
+        // Transform backend data to match combobox expectations
+        const searchResults: PlaceSearchResult[] = backendResults.map(place => ({
+            value: place.id,
+            label: place.name,
+        }));
+
+        console.log(`Found ${searchResults.length} initial places`);
+        return searchResults;
+    }
+    catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        console.error(`Error in getInitialPlaces:`, errorMessage);
+        console.error('Full error object:', error);
+
+        // Return empty array on error
+        console.log("Returning empty initial places due to error.");
         return [];
     }
 };

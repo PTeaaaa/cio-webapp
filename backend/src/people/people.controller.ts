@@ -39,7 +39,7 @@ export class PeopleController {
     }
 
     @Get('getpeoplebyplaceId-public/:placeId')
-    getPeopleByPlaceIdPUBLIC(
+    getPeopleByPlaceIdPublic(
         @Param('placeId', new ParseUUIDPipe()) placeId: string,
         @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number = 5,
         @Query('limit', new DefaultValuePipe(5), ParseIntPipe) limit: number = 5,

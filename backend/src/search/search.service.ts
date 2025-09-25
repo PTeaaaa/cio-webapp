@@ -6,44 +6,6 @@ import { Prisma } from '@prisma/client';
 export class SearchService {
     constructor(private readonly prisma: PrismaService) { }
 
-    // async searchNames(query: string, type: 'all' | 'people' | 'places' = 'all', limit = 10, offset = 0) {
-    //     if (!query || query.trim() === '') {
-    //         return {
-    //             people: [],
-    //             places: [],
-    //             meta: {
-    //                 total: 0,
-    //                 limit,
-    //                 offset,
-    //             }
-    //         };
-    //     }
-
-    //     const results = {
-    //         people: [] as any[],
-    //         places: [] as any[],
-    //         meta: {
-    //             total: 0,
-    //             limit,
-    //             offset,
-    //         }
-    //     };
-
-    //     if (type === 'all' || type === 'people') {
-    //         const people = await this.searchPeopleByName(query, limit, offset);
-    //         results.people = people;
-    //         results.meta.total += people.length;
-    //     }
-
-    //     if (type === 'all' || type === 'places') {
-    //         const places = await this.searchPlacesByName(query, limit, offset);
-    //         results.places = places;
-    //         results.meta.total += places.length;
-    //     }
-
-    //     return results;
-    // }
-
     async searchYears(nameOrYear: string | number, limit = 10, offset = 0) {
         const raw = typeof nameOrYear === 'number' ? String(nameOrYear) : (nameOrYear ?? '');
         const term = raw.trim();
@@ -112,7 +74,7 @@ export class SearchService {
         try {
             // Enhanced Thai text search combining multiple strategies
             const searchLength = searchTerm.length;
-            
+
             let query: string;
             let params: any[];
             let paramIndex: number;
@@ -143,7 +105,7 @@ export class SearchService {
             } else {
                 // For 3+ characters, use enhanced trigram + prefix + contains
                 const similarityThreshold = 0.05; // Even lower threshold for more results
-                
+
                 query = `
                     SELECT id, name, agency,
                     CASE 
@@ -175,7 +137,7 @@ export class SearchService {
             } else {
                 query += ` ORDER BY match_priority DESC, similarity_score DESC, name ASC`;
             }
-            
+
             query += ` LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`;
             params.push(limit, offset);
 
@@ -319,5 +281,45 @@ export class SearchService {
     //             }
     //         });
     //     }
+    // }
+
+    // =================================== Separator =================================== //
+
+    // async searchNames(query: string, type: 'all' | 'people' | 'places' = 'all', limit = 10, offset = 0) {
+    //     if (!query || query.trim() === '') {
+    //         return {
+    //             people: [],
+    //             places: [],
+    //             meta: {
+    //                 total: 0,
+    //                 limit,
+    //                 offset,
+    //             }
+    //         };
+    //     }
+
+    //     const results = {
+    //         people: [] as any[],
+    //         places: [] as any[],
+    //         meta: {
+    //             total: 0,
+    //             limit,
+    //             offset,
+    //         }
+    //     };
+
+    //     if (type === 'all' || type === 'people') {
+    //         const people = await this.searchPeopleByName(query, limit, offset);
+    //         results.people = people;
+    //         results.meta.total += people.length;
+    //     }
+
+    //     if (type === 'all' || type === 'places') {
+    //         const places = await this.searchPlacesByName(query, limit, offset);
+    //         results.places = places;
+    //         results.meta.total += places.length;
+    //     }
+
+    //     return results;
     // }
 }

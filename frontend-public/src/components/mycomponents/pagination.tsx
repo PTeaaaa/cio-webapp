@@ -33,53 +33,61 @@ export default function PaginationControl({ currentPage, totalPages }: { current
     <div>
       <Pagination>
         <PaginationContent>
+          <PaginationItem>
+            <PaginationPrevious
+              className={`hover:bg-[#0f804f] hover:text-white transition-all duration-150 ${isFirstPage ? ' opacity-50 cursor-not-allowed pointer-events-none' : ''}`}
+              href={!isFirstPage ? `?page=${currentPage - 1}` : undefined}
+            />
+          </PaginationItem>
+
+          {/* Always show first page if not in range */}
+          {pageNumbers[0] > 1 && (
             <PaginationItem>
-              <PaginationPrevious
-                className={`hover:bg-[#0f804f] hover:text-white transition-all duration-150 ${isFirstPage ? ' opacity-50 cursor-not-allowed pointer-events-none' : ''}`}
-                href={!isFirstPage ? `?page=${currentPage - 1}` : undefined}
-              />
+              <PaginationLink
+                className="hover:bg-[#0f804f] hover:text-white transition-all duration-150"
+                href="?page=1"
+              >1</PaginationLink>
             </PaginationItem>
-
-            {/* Always show first page if not in range */}
-            {pageNumbers[0] > 1 && (
-              <PaginationItem>
-                <PaginationLink className="hover:bg-[#0f804f] hover:text-white transition-all duration-150" href="?page=1">1</PaginationLink>
-              </PaginationItem>
-            )}
-            {pageNumbers[0] > 2 && (
-              <PaginationItem>
-                <PaginationEllipsis />
-              </PaginationItem>
-            )}
-
-            {/* Main page numbers */}
-            {pageNumbers.map((page) => (
-              <PaginationItem key={page}>
-                <PaginationLink className="hover:bg-[#0f804f] hover:text-white transition-all duration-150" href={`?page=${page}`} isActive={page === currentPage}
-                >
-                  {page}
-                </PaginationLink>
-              </PaginationItem>
-            ))}
-
-            {/* Always show last page if not in range */}
-            {pageNumbers[pageNumbers.length - 1] < totalPages - 1 && (
-              <PaginationItem>
-                <PaginationEllipsis />
-              </PaginationItem>
-            )}
-            {pageNumbers[pageNumbers.length - 1] < totalPages && (
-              <PaginationItem>
-                <PaginationLink className="hover:bg-[#0f804f] hover:text-white transition-all duration-150" href={`?page=${totalPages}`}>{totalPages}</PaginationLink>
-              </PaginationItem>
-            )}
-
+          )}
+          {pageNumbers[0] > 2 && (
             <PaginationItem>
-              <PaginationNext
-                className={`hover:bg-[#0f804f] hover:text-white transition-all duration-150${isLastPage ? ' opacity-50 cursor-not-allowed pointer-events-none' : ''}`}
-                href={!isLastPage ? `?page=${currentPage + 1}` : undefined}
-              />
+              <PaginationEllipsis />
             </PaginationItem>
+          )}
+
+          {/* Main page numbers */}
+          {pageNumbers.map((page) => (
+            <PaginationItem key={page}>
+              <PaginationLink
+                className="hover:bg-[#0f804f] hover:text-white transition-all duration-150"
+                href={`?page=${page}`}
+                isActive={page === currentPage}
+
+              >
+                {page}
+              </PaginationLink>
+            </PaginationItem>
+          ))}
+
+          {/* Always show last page if not in range */}
+          {pageNumbers[pageNumbers.length - 1] < totalPages - 1 && (
+            <PaginationItem>
+              <PaginationEllipsis />
+            </PaginationItem>
+          )}
+          {pageNumbers[pageNumbers.length - 1] < totalPages && (
+            <PaginationItem>
+              <PaginationLink className="hover:bg-[#0f804f] hover:text-white transition-all duration-150" href={`?page=${totalPages}`}>{totalPages}</PaginationLink>
+            </PaginationItem>
+          )}
+
+          <PaginationItem>
+            <PaginationNext
+              className={`hover:bg-[#0f804f] hover:text-white transition-all duration-150
+                ${isLastPage ? ' opacity-50 cursor-not-allowed pointer-events-none' : ''}`}
+              href={!isLastPage ? `?page=${currentPage + 1}` : undefined}
+            />
+          </PaginationItem>
         </PaginationContent>
       </Pagination>
     </div >
