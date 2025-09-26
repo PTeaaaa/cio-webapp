@@ -11,7 +11,7 @@ export const getAllPlaces = async (): Promise<Place[] | null> => {
         }
 
         return response.json();
-        
+
     } catch (error) {
         console.error("Error in getAllPlaces:", error);
         return null;
@@ -28,7 +28,7 @@ export const getPlaceById = async (placeId: string): Promise<Place | null> => {
         }
 
         return response.json();
-        
+
     } catch (error) {
         console.error("Error in getPlaceById:", error);
         return null;

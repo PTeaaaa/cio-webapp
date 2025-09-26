@@ -7,7 +7,7 @@ export type ApiFetchOptions = Omit<RequestInit, 'headers' | 'credentials'> & {
   skipAuth?: boolean; // Skip automatic JWT token attachment for public endpoints
 };
 
-const API_BASE = (process.env.NEXT_PUBLIC_NESTJS_API_URL ?? '').replace(/\/+$/, '');
+const API_BASE = (process.env.NEXT_PUBLIC_BACKEND_API_URL ?? '').replace(/\/+$/, '');
 
 // Endpoints that don't need authentication
 const PUBLIC_ENDPOINTS = ['/auth/login', '/auth/signup', '/auth/refresh-token'];
@@ -66,15 +66,15 @@ export async function apiFetch(endpoint: string, opts: ApiFetchOptions = {}): Pr
 
   const body =
     formData ? formData :
-    json !== undefined ? JSON.stringify(json) :
-    rest.body;
+      json !== undefined ? JSON.stringify(json) :
+        rest.body;
 
   const controller = new AbortController();
   const timer = timeoutMs ? setTimeout(() => controller.abort('timeout'), timeoutMs) : undefined;
 
   try {
     console.log('🌐 APIFETCH: Making request to:', endpoint);
-    
+
     const response = await fetch(`${API_BASE}${endpoint}`, {
       ...rest,
       credentials,
@@ -87,25 +87,25 @@ export async function apiFetch(endpoint: string, opts: ApiFetchOptions = {}): Pr
     // If we get a 401 and it's not a public endpoint, try to refresh the token
     if (response.status === 401 && !isPublicEndpoint && !skipAuth) {
       console.log('🔄 APIFETCH: Got 401 for', endpoint, '- attempting to refresh access token...');
-      
+
       // Prevent multiple concurrent refresh attempts
       if (!isRefreshing) {
         isRefreshing = true;
         refreshPromise = refreshAccessToken();
       }
-      
+
       const refreshSuccess = await refreshPromise;
       isRefreshing = false;
       refreshPromise = null;
-      
+
       if (refreshSuccess) {
         // Create a new AbortController for the retry request
         const retryController = new AbortController();
         const retryTimer = timeoutMs ? setTimeout(() => retryController.abort('timeout'), timeoutMs) : undefined;
-        
+
         try {
           console.log('🔄 APIFETCH: Retrying request to', endpoint, 'with refreshed cookie...');
-          
+
           const retryResponse = await fetch(`${API_BASE}${endpoint}`, {
             ...rest,
             credentials,
@@ -114,13 +114,13 @@ export async function apiFetch(endpoint: string, opts: ApiFetchOptions = {}): Pr
             body,
             signal: retryController.signal,
           });
-          
+
           if (retryResponse.ok) {
             console.log('✅ APIFETCH: Retry successful for', endpoint);
           } else {
             console.log('🚫 APIFETCH: Retry failed for', endpoint, 'with status:', retryResponse.status);
           }
-          
+
           return retryResponse;
         } finally {
           if (retryTimer) clearTimeout(retryTimer);

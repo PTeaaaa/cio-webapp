@@ -1,5 +1,5 @@
 import { headers } from "next/headers";
-import AdvancedSearch from "@/mycomponents/advSearch";
+import AdvancedSearch from "@/components/mycomponents/advSearch";
 
 // Server component to handle headers and main layout
 export default async function AdSearch() {

@@ -1,9 +1,6 @@
 import { PersonForm, PeopleResponse } from "@/types";
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_NESTJS_API_URL;
-if (!BACKEND_URL) {
-  console.warn("NEXT_PUBLIC_NESTJS_API_URL is not defined in Server Component context.");
-}
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL || 'http://localhost:3003';
 
 export const getPersonByPersonId = async (personId: string): Promise<PersonForm | null> => {
 

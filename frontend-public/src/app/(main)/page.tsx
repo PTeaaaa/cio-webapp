@@ -1,4 +1,5 @@
 "use client";
+
 import "@/app/globals.css";
 import BreadcrumbUpdater from "@/helpercomponents/breadcrumbsupdater";
 import { BreadcrumbItem } from "@/types";
@@ -9,9 +10,7 @@ export default function Homepage() {
 
   return (
     <>
-
       <BreadcrumbUpdater breadcrumbItems={breadcrumbItems} />
-
         <div className="pt-[30px] pb-4 px-10 lg:px-20">
           <div className="flex flex-col bg-white items-center rounded-2xl shadow-xl/30 font-prompt md:pl-8 lg:p-10 w-full">
             <div className="p-4 text-center">

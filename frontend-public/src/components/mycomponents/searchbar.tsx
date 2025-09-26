@@ -87,7 +87,7 @@ export default function SearchBar({ onSearch, debounceTime = 300, placeholder = 
             <div className="flex justify-end items-center">
 
                 <Link
-                    href="/page/AdvancedSearch"
+                    href="/filter"
                     title="การค้นหาขั้นสูง"
                     className={`${expanded ? "-mr-7" : "mr-3"} hover:cursor-pointer inline-flex items-center justify-center w-9 h-9 rounded`}
                 >
