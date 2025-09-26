@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 import { useSearchParams } from 'next/navigation';
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL!;
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL!;
 
 const fetcher = async (url: string) => {
   console.log('🔍 Fetching:', url);
@@ -24,13 +24,13 @@ export default function TestMSWPage() {
   const searchParams = useSearchParams();
   const [currentMode, setCurrentMode] = useState<string>('success');
   const [testAgency] = useState('กรมการแพทย์');
-  
+
   const mockMode = searchParams.get('mock') || 'success';
-  
+
   useEffect(() => {
     console.log('🎯 Mock mode from URL:', mockMode);
     setCurrentMode(mockMode);
-    
+
     // Update MSW mode when URL changes
     if (process.env.NEXT_PUBLIC_API_MOCKING === 'enabled') {
       import('@/mocks/browser').then(({ setMockMode }) => {
@@ -63,7 +63,7 @@ export default function TestMSWPage() {
     <div className="min-h-screen p-8 bg-gray-50">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold mb-6">MSW Testing Page</h1>
-        
+
         {/* Mode Controls */}
         <div className="bg-white p-6 rounded-lg shadow mb-6">
           <h2 className="text-xl font-semibold mb-4">Mock Mode Controls</h2>
@@ -100,7 +100,7 @@ export default function TestMSWPage() {
             <p><strong>Has Error:</strong> {error ? 'Yes' : 'No'}</p>
             <p><strong>Has Data:</strong> {data ? 'Yes' : 'No'}</p>
           </div>
-          <button 
+          <button
             onClick={handleRefresh}
             className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
           >
@@ -111,7 +111,7 @@ export default function TestMSWPage() {
         {/* Results Display */}
         <div className="bg-white p-6 rounded-lg shadow">
           <h2 className="text-xl font-semibold mb-4">API Response</h2>
-          
+
           {isLoading && (
             <div className="flex items-center justify-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>

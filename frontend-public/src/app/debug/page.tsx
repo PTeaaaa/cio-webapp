@@ -3,7 +3,7 @@
 import { useState } from 'react';
 
 export default function DebugPage() {
-    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3003';
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_API_URL || 'http://localhost:3003';
     const [result, setResult] = useState<string>('');
 
     const testFetch = async () => {
@@ -55,7 +55,7 @@ export default function DebugPage() {
     return (
         <div className="p-8">
             <h1 className="text-2xl mb-4">Debug Page</h1>
-            <p><strong>NEXT_PUBLIC_BACKEND_URL:</strong> {backendUrl || 'UNDEFINED'}</p>
+            <p><strong>NEXT_PUBLIC_BACKEND_API_URL:</strong> {backendUrl || 'UNDEFINED'}</p>
 
             <div className="space-y-4 mt-4">
                 <button

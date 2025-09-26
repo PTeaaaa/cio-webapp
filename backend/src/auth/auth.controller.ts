@@ -6,7 +6,6 @@ import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '@/prisma/prisma.service';
 import { getSessionCookieOpts } from './session/session-cookie';
 import { SignupDto } from './dto/signup.dto';
-import { jwtVerify } from 'jose';
 import { JwtGuard } from './guards/jwt.guard';
 
 @Controller('auth')
@@ -23,7 +22,7 @@ export class AuthController {
         try {
             const rememberMe = dto.rememberMe !== false; // Default to true if not specified
             const result = await this.authService.login(dto.username, dto.password, res, rememberMe);
-            
+
             // Set access token in secure HTTP-only cookie
             // If rememberMe is false, don't set maxAge to make it a session cookie
             const cookieOptions: any = {
@@ -32,15 +31,15 @@ export class AuthController {
                 sameSite: 'strict',
                 path: '/',
             };
-            
+
             // Only set maxAge if rememberMe is true
             if (rememberMe) {
                 cookieOptions.maxAge = 60 * 60 * 1000; // 1 hour (same as JWT expiration)
             }
-            
+
             res.cookie('at', result.accessToken, cookieOptions);
-            
-            return { 
+
+            return {
                 user: result.user,
                 message: 'Login successful'
             };
@@ -53,7 +52,7 @@ export class AuthController {
 
     @Post('logout')
     async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
-        
+
         // Clear the access token cookie
         res.clearCookie('at', {
             httpOnly: true,
@@ -61,7 +60,7 @@ export class AuthController {
             sameSite: 'strict',
             path: '/',
         });
-        
+
         // Clear the refresh token cookie
         res.clearCookie('rt', {
             httpOnly: true,
@@ -122,7 +121,7 @@ export class AuthController {
 
         try {
             const result = await this.authService.refreshToken(rt);
-            
+
             // Use the stored remember me preference from the database
             const cookieOptions: any = {
                 httpOnly: true,
@@ -130,12 +129,12 @@ export class AuthController {
                 sameSite: 'strict',
                 path: '/',
             };
-            
+
             // Only set maxAge if the original session had rememberMe = true
             if (result.rememberMe) {
                 cookieOptions.maxAge = 60 * 60 * 1000; // 1 hour
             }
-            
+
             res.cookie('at', result.accessToken, cookieOptions);
 
             return { message: 'Token refreshed successfully' };

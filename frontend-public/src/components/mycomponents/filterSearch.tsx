@@ -7,11 +7,16 @@ import searchNavigation from "../../services/navigation/search/searchNavigation"
 import ComboboxMain from "./combobox/combobox-main";
 import ComboboxSub from "./combobox/combobox-sub";
 import ComboboxYear from "./combobox/combobox-year";
+import FilterResult from "./filterResult";
+import { getPeopleByPlaceId } from "@/services/peoplePublicAPI/peoplePublicAPI";
+import { PeopleResponse } from "@/types";
 
 export default function FilterSearch() {
     const [selectedOrg, setSelectedOrg] = useState<string>("");       // for disabling agency until org selected
     const [selectedAgency, setSelectedAgency] = useState<string>(""); // for disabling year until agency selected
     const [selectedYear, setSelectedYear] = useState<string>(""); // for storing selected year
+    const [peopleResponse, setPeopleResponse] = useState<PeopleResponse | null>(null);
+    const [isLoadingPeople, setIsLoadingPeople] = useState<boolean>(false);
 
     const router = useRouter();
 
@@ -24,6 +29,29 @@ export default function FilterSearch() {
     // Clear selected year when selectedAgency changes
     useEffect(() => {
         setSelectedYear("");
+    }, [selectedAgency]);
+
+    // Fetch people data when selectedAgency changes
+    useEffect(() => {
+        const fetchPeople = async () => {
+            if (!selectedAgency) {
+                setPeopleResponse(null);
+                return;
+            }
+
+            setIsLoadingPeople(true);
+            try {
+                const response = await getPeopleByPlaceId(selectedAgency, 1, 100);
+                setPeopleResponse(response);
+            } catch (error) {
+                console.error('Error fetching people:', error);
+                setPeopleResponse(null);
+            } finally {
+                setIsLoadingPeople(false);
+            }
+        };
+
+        fetchPeople();
     }, [selectedAgency]);
 
     // Handle search navigation with support for both left-click and middle-click
@@ -101,64 +129,38 @@ export default function FilterSearch() {
                     </div>
                 </div>
 
-                <div className="w-2/3 border-l-1 border-gray-300 text-center">
-                    <div className="text-lg font-medium mb-4">ผลลัพธ์การค้นหาบุคคลที่พบ</div>
+                <div className="w-2/3 border-l-1 border-gray-300 pl-6">
+                    <h1 className="text-lg font-bold text-center mb-7">ผลลัพธ์การค้นหาบุคลากร</h1>
 
-                    <div className="font-prompt grid grid-cols-1 mb-6 items-center mx-11 my-3 text-lg mb-1 p-3 shadow-md rounded-xl border hover:bg-gray-100 transition-all duration-300">
-
-                        <h2 className="font-semibold text-base mb-1">
-                            ปีงบประมาณ XXXX
-                        </h2>
-                        <p className="text-muted-foreground text-sm">
-                            Mr.X Brian Jown
-                        </p>
-
-                    </div>
-
-                    <div className="font-prompt grid grid-cols-1 mb-6 items-center mx-11 my-3 text-lg mb-1 p-3 shadow-md rounded-xl border hover:bg-gray-100 transition-all duration-300">
-
-                        <h2 className="font-semibold text-base mb-1">
-                            ปีงบประมาณ XXXX
-                        </h2>
-                        <p className="text-muted-foreground text-sm">
-                            Mr.X Brian Jown
-                        </p>
-
-                    </div>
-
-                    <div className="font-prompt grid grid-cols-1 mb-6 items-center mx-11 my-3 text-lg mb-1 p-3 shadow-md rounded-xl border hover:bg-gray-100 transition-all duration-300">
-
-                        <h2 className="font-semibold text-base mb-1">
-                            ปีงบประมาณ XXXX
-                        </h2>
-                        <p className="text-muted-foreground text-sm">
-                            Mr.X Brian Jown
-                        </p>
-
-                    </div>
-
-                    <div className="font-prompt grid grid-cols-1 mb-6 items-center mx-11 my-3 text-lg mb-1 p-3 shadow-md rounded-xl border hover:bg-gray-100 transition-all duration-300">
-
-                        <h2 className="font-semibold text-base mb-1">
-                            ปีงบประมาณ XXXX
-                        </h2>
-                        <p className="text-muted-foreground text-sm">
-                            Mr.X Brian Jown
-                        </p>
-
-                    </div>
-
-                    <div className="font-prompt grid grid-cols-1 mb-6 items-center mx-11 my-3 text-lg mb-1 p-3 shadow-md rounded-xl border hover:bg-gray-100 transition-all duration-300">
-
-                        <h2 className="font-semibold text-base mb-1">
-                            ปีงบประมาณ XXXX
-                        </h2>
-                        <p className="text-muted-foreground text-sm">
-                            Mr.X Brian Jown
-                        </p>
-
-                    </div>
-
+                    {isLoadingPeople ? (
+                        <div className="flex justify-center items-center py-8">
+                            <div className="text-gray-500">กำลังโหลดข้อมูล...</div>
+                        </div>
+                    ) : !selectedAgency ? (
+                        <div className="flex justify-center items-center py-8">
+                            <div className="text-gray-500 text-center">กรุณาเลือก
+                                <span className="font-bold"> หน่วยงาน </span>
+                                และ
+                                <span className="font-bold"> ปีงบประมาณ </span>
+                                เพื่อดูผลลัพธ์</div>
+                        </div>
+                    ) : selectedYear ? (
+                        <FilterResult
+                            category={selectedOrg}
+                            placeUUID={selectedAgency}
+                            personUUID={selectedYear}
+                        />
+                    ) : peopleResponse?.data && peopleResponse.data.length > 0 ? (
+                        <FilterResult
+                            category={selectedOrg}
+                            placeUUID={selectedAgency}
+                            items={peopleResponse.data}
+                        />
+                    ) : (
+                        <div className="flex justify-center items-center py-8">
+                            <div className="text-gray-500">ไม่พบข้อมูลบุคลากรในหน่วยงานนี้</div>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

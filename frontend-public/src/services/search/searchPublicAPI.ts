@@ -1,6 +1,6 @@
 import { PlaceForm, PlacesResponse, PlaceSearchResult, PersonForm } from "@/types";
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3003';
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL || 'http://localhost:3003';
 
 export const searchPlacesByName = async (
     searchTerm: string,
@@ -112,7 +112,7 @@ export const getInitialPlaces = async (
 
         // Handle different response formats based on endpoint
         let backendResults: PlaceForm[] = [];
-        
+
         if (agency && agency.trim() !== '') {
             // Agency-specific endpoint returns PlacesResponse format
             const placesResponse = await response.json();

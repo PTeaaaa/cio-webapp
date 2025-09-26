@@ -6,7 +6,8 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@/components/pagination"
+} from "@/components/pagination";
+import { cn } from "@/lib/utils";
 
 export default function PaginationControl({ currentPage, totalPages }: { currentPage: number, totalPages: number }) {
   // Generate up to 5 page numbers, centered around currentPage
@@ -28,6 +29,7 @@ export default function PaginationControl({ currentPage, totalPages }: { current
 
   const isFirstPage = currentPage === 1
   const isLastPage = currentPage === totalPages
+
 
   return (
     <div>
@@ -59,10 +61,11 @@ export default function PaginationControl({ currentPage, totalPages }: { current
           {pageNumbers.map((page) => (
             <PaginationItem key={page}>
               <PaginationLink
-                className="hover:bg-[#0f804f] hover:text-white transition-all duration-150"
+                className={cn("hover:bg-[#0f804f] hover:text-white transition-all duration-150",
+                  page === currentPage ? "pointer-events-none" : "",
+                )}
                 href={`?page=${page}`}
                 isActive={page === currentPage}
-
               >
                 {page}
               </PaginationLink>

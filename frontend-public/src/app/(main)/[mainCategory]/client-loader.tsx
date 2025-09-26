@@ -7,7 +7,7 @@ import sidebarData from "@/mockData/Sidebardata.json";
 import BreadcrumbUpdater from "@/helpercomponents/breadcrumbsupdater";
 import OtherErrorCard from "@/components/mycomponents/Card-OtherError";
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL!;
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL!;
 
 const fetcher = async (url: string) => {
   console.log('🔍 ClientLoader fetching:', url);
