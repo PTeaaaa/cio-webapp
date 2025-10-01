@@ -20,11 +20,13 @@ export const ROUTE_PERMISSIONS: Record<string, string[]> = {
     // Admin only routes
     "/listaccounts": ["admin"],
     "/addaccount": ["admin"],
+    "/addplace": ["admin"],
     "/edit-account": ["admin"],
 
     // User/Admin routes
     "/listpeople": ["admin", "user"],
-    "/edit" : ["admin", "user"],
+    "/edit": ["admin", "user"],
+    "/addnew": ["admin", "user"],
 
 
     // ---------------- Example ---------------- //
@@ -45,7 +47,7 @@ export const ROUTE_PERMISSIONS: Record<string, string[]> = {
 
     "/viewer": ["admin", "user", "place", "viewer"],
     "/viewer/dashboard": ["admin", "user", "place", "viewer"],
-    
+
 };
 
 // Check if a user role can access a specific path

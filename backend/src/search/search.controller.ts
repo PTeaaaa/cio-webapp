@@ -5,16 +5,6 @@ import { SearchService } from './search.service';
 export class SearchController {
     constructor(private readonly searchService: SearchService) { }
 
-    // @Get('names')
-    // searchNames(
-    //     @Query('query') query: string,
-    //     @Query('type') type: 'all' | 'people' | 'places' = 'all',
-    //     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
-    //     @Query('offset', new DefaultValuePipe(0), ParseIntPipe) offset: number,
-    // ) {
-    //     return this.searchService.searchNames(query, type, limit, offset);
-    // }
-
     @Get('years')
     searchYears(
         @Query('name') name: string,

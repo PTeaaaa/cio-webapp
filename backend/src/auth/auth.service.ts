@@ -120,8 +120,8 @@ export class AuthService {
         // Store the HASHED refresh token in the database AND update session preference
         await this.prisma.account.update({
             where: { id: userId },
-            data: { 
-                refreshToken: hashedToken, 
+            data: {
+                refreshToken: hashedToken,
                 refreshTokenExpiresAt: expires,
                 rememberMeSession: rememberMe  // Store session preference
             },
@@ -162,7 +162,7 @@ export class AuthService {
         const newAccessToken = await this.createAccessToken(account);
 
         // Return the access token AND the stored session preference
-        return { 
+        return {
             accessToken: newAccessToken,
             rememberMe: account.rememberMeSession ?? account.rememberMe  // Use session preference, fallback to default
         };
@@ -224,4 +224,62 @@ export class AuthService {
             data: { rememberMe }
         });
     }
+
+    // ใน auth.service.ts
+    async handleOAuthCallback(code: string, res: Response) {
+        // --- ส่วนที่จำลองขึ้นมา ---
+        // ปกติจะยิง API ไปแลก Token แต่ตอนนี้เราแค่แกล้งทำ
+        const mockAccessToken = this.getMockAccessToken(code);
+
+        // ปกติจะยิง API ไปขอข้อมูล User แต่ตอนนี้เราแค่แกล้งทำ
+        const mockUserInfo = this.getMockUserInfo(mockAccessToken);
+        // --- จบส่วนจำลอง ---
+
+        // --- ส่วน Logic จริงที่คุณเขียนได้เลย ---
+        // 1. ค้นหา User ใน DB ของคุณด้วย cardId ที่ได้จาก Mock Data
+        let user = await this.prisma.account.findUnique({
+            where: { cardId: mockUserInfo.cardId },
+        });
+
+        // 2. ถ้าไม่เจอก็สร้างใหม่
+        if (!user) {
+            user = await this.prisma.account.create({
+                data: {
+                    cardId: mockUserInfo.cardId,
+                    email: mockUserInfo.email,
+                    username: mockUserInfo.cardId, // Use cardId as username for OAuth users
+                    password: '', // OAuth users don't have passwords, use empty string or hash
+                    role: mockUserInfo.role, // Use role from mock user info
+                    name: mockUserInfo.name,
+                },
+            });
+        }
+
+        // 3. สร้าง JWT Token ของแอปคุณเอง (ใช้ฟังก์ชันเดิมได้เลย)
+        const appAccessToken = await this.createAccessToken(user);
+        await this.createRefreshToken(user.id, res, true); // Create refresh token with remember me enabled
+
+        // Return user data and access token (refresh token is set in cookie)
+        const { password: _, ...userWithoutPassword } = user;
+        return { user: userWithoutPassword, accessToken: appAccessToken };
+    }
+
+    // ฟังก์ชันจำลองที่คุณสร้างขึ้นมาเองเพื่อการทดสอบ
+    private getMockAccessToken(code: string): string {
+        if (code === 'valid_mock_code') return 'mock_access_token_123';
+        throw new Error('Invalid Mock Code');
+    }
+
+    private getMockUserInfo(token: string) {
+        if (token === 'mock_access_token_123') {
+            return {
+                cardId: '99999',
+                email: 'test.user@company.com',
+                name: 'Test User',
+                role: 'admin',
+            };
+        }
+        throw new Error('Invalid Mock Access Token');
+    }
 }
+

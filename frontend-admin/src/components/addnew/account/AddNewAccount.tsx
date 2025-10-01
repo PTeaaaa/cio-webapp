@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
-import Input from "../form/input/InputField";
-import Label from "../form/Label";
+import Input from "../../form/input/InputField";
+import Label from "../../form/Label";
 import ComponentCard from '@/components/common/ComponentCard';
 import { useAccountForm } from '@/hooks/useAccountForm';
 
@@ -69,13 +69,12 @@ export default function AddNewAccount() {
                                     onChange={(e) => {
                                         handleInputChange('role', e.target.value);
                                     }}
-                                    className="w-full p-2.5 border rounded-lg bg-white dark:bg-gray-900 dark:border-gray-700 text-gray-900 dark:text-white text-sm"
+                                    className="w-full p-2.5 border rounded-lg bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-gray-500 dark:text-gray-400 text-sm"
                                     required
                                 >
                                     <option value="">กรุณาเลือกประเภทของบัญชี</option>
-                                    <option value="admin">Admin</option>
-                                    <option value="user">User</option>
-                                    <option value="moderator">Moderator</option>
+                                    <option value="admin" className="text-gray-600 dark:text-gray-400">Admin</option>
+                                    <option value="user" className="text-gray-600 dark:text-gray-400">User</option>
                                 </select>
                             </div>
 
@@ -142,12 +141,12 @@ export default function AddNewAccount() {
                                                 e.target.value = ""; // Reset dropdown
                                             }
                                         }}
-                                        className="w-full p-2.5 border rounded-lg bg-white dark:bg-gray-900 dark:border-gray-700 text-gray-400 dark:text-white/30 text-sm"
+                                        className="w-full p-2.5 border rounded-lg bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-gray-500 dark:text-gray-400 text-sm"
                                         required
                                     >
                                         <option value="">กรุณาเลือกหน่วยงาน</option>
                                         {places.map((place) => (
-                                            <option key={place.id} value={place.id}>
+                                            <option key={place.id} value={place.id} className="text-gray-600 dark:text-gray-400">
                                                 {place.name}
                                             </option>
                                         ))}

@@ -13,7 +13,17 @@
             "icon": "Contact",
             "name": "ข้อมูลบัญชีผู้ใช้",
             "path": "/listaccounts",
-            "role": ["admin"]
+            "role": [
+                "admin"
+            ]
+        },
+        {
+            "icon": "HousePlus",
+            "name": "เพิ่มสถานที่ใหม่",
+            "path": "/addplace",
+            "role": [
+                "admin"
+            ]
         }
     ]
 }

@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { User } from "@/types";
-import { apiLogin, apiLogout } from '@/services/auth/authAPI';
+import { apiLogin, apiLogout, apiOAuthCallback } from '@/services/auth/authAPI';
 import { getSession } from '@/services/auth/authAPI';
 
 interface AuthContextType {
@@ -10,6 +10,7 @@ interface AuthContextType {
     isLoading: boolean;
     isLoggingOut: boolean; // Add this flag
     login: (username: string, password: string, rememberMe?: boolean) => Promise<boolean>;
+    oauthLogin: (code: string) => Promise<boolean>;
     logout: () => Promise<void>;
 }
 
@@ -110,6 +111,21 @@ export function AuthProvider({ initialUser, children }: { initialUser: User | nu
         }
     };
 
+    const oauthLogin = async (code: string) => {
+        setIsLoading(true);
+        try {
+            const u = await apiOAuthCallback(code);
+            setUser(u);
+            router.replace('/'); // ไปหน้าแรก/แดชบอร์ดตามจริง
+            return true;
+        } catch (e) {
+            console.error('OAuth login failed:', e);
+            return false;
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     // Alternative logout method using router.replace with additional safeguards
     const logout = async () => {
         setIsLoading(true);
@@ -174,7 +190,7 @@ export function AuthProvider({ initialUser, children }: { initialUser: User | nu
         }
     };
 
-    const value = useMemo(() => ({ user, isLoading, isLoggingOut, login, logout }), [user, isLoading, isLoggingOut]);
+    const value = useMemo(() => ({ user, isLoading, isLoggingOut, login, oauthLogin, logout }), [user, isLoading, isLoggingOut]);
     
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

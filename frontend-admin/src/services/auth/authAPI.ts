@@ -56,3 +56,19 @@ export async function getSession(): Promise<User | null> {
         return null;
     }
 }
+
+export async function apiOAuthCallback(code: string): Promise<User> {
+    const res = await apiFetch('/auth/oauth/callback', {
+        method: 'POST',
+        json: { code },
+        skipAuth: true, // Skip auth for OAuth callback endpoint
+    });
+    if (!res.ok) throw new Error('OAuth callback failed');
+    const data = await res.json();
+    
+    console.log('✅ AUTH_API: OAuth login successful, tokens set in secure HTTP-only cookies');
+    
+    // No need to store tokens in localStorage - they're in secure cookies
+    // backend sets both access token (at) and refresh token (rt) cookies
+    return data.user as User;
+}

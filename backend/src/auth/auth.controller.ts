@@ -145,4 +145,33 @@ export class AuthController {
         }
     }
 
+    @Post('oauth/callback')
+    async oauthCallback(@Body() dto: { code: string }, @Res({ passthrough: true }) res: Response) {
+        try {
+            const result = await this.authService.handleOAuthCallback(dto.code, res);
+
+            // Set access token in secure HTTP-only cookie (same as regular login)
+            const cookieOptions = {
+                httpOnly: true,
+                secure: this.configService.get('app.nodeEnv') === 'production',
+                sameSite: 'strict' as const,
+                path: '/',
+                maxAge: 60 * 60 * 1000, // 1 hour (same as JWT expiration)
+            };
+
+            res.cookie('at', result.accessToken, cookieOptions);
+
+            return {
+                user: result.user,
+                message: 'OAuth login successful'
+            };
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            console.log('OAUTH: OAuth callback failed -', errorMessage);
+            throw error;
+        }
+    }
+
+
+
 }

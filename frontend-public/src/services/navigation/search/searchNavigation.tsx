@@ -1,4 +1,3 @@
-
 "use client";
 
 type SegmentValue = string | null | undefined;

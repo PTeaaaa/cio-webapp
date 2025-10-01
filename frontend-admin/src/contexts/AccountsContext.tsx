@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { AccountForm, UpdateAccountPayload } from "@/types";
-import { getAllAccounts, createAccount, SignupPayload, getAccountById, updateAccount } from '@/services/accounts/accountAPI';
+import { getAllAccounts, createAccount, SignupPayload, getAccountById, updateAccount, deleteAccount as deleteAccountAPI } from '@/services/accounts/accountAPI';
 
 interface AuthContextType {
     accounts: AccountForm[];
@@ -12,6 +12,7 @@ interface AuthContextType {
     signUp: (payload: SignupPayload) => Promise<{ success: boolean; error?: string }>;
     getAccount: (id: string) => Promise<AccountForm | null>;
     updateAccountData: (id: string, payload: UpdateAccountPayload) => Promise<{ success: boolean; error?: string }>;
+    deleteAccount: (id: string, onSuccess?: () => void) => Promise<{ success: boolean; error?: string }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -81,11 +82,11 @@ export function AccountsProvider({ children }: { children: React.ReactNode }) {
         try {
             setAccountsError(null);
             const result = await updateAccount(id, payload);
-            
+
             if (result) {
                 // Update the account in the local state
-                setAccounts(prevAccounts => 
-                    prevAccounts.map(account => 
+                setAccounts(prevAccounts =>
+                    prevAccounts.map(account =>
                         account.id === id ? result : account
                     )
                 );
@@ -104,10 +105,10 @@ export function AccountsProvider({ children }: { children: React.ReactNode }) {
         try {
             setAccountsError(null);
             const result = await createAccount(payload);
-            
+
             // Automatically refresh accounts list after successful creation
             await refreshAccounts();
-            
+
             return { success: true };
         } catch (err: any) {
             const errorMessage = err.message || "Failed to create account";
@@ -116,14 +117,39 @@ export function AccountsProvider({ children }: { children: React.ReactNode }) {
         }
     };
 
-    const value = useMemo(() => ({ 
-        accounts, 
-        accountsLoading, 
+    const deleteAccount = async (id: string, onSuccess?: () => void): Promise<{ success: boolean; error?: string }> => {
+        try {
+            setAccountsError(null);
+            await deleteAccountAPI(id);
+
+            // Call the success callback immediately (for navigation)
+            if (onSuccess) {
+                onSuccess();
+            }
+
+            // Delay state update to allow navigation to complete first
+            // This prevents the edit page from trying to refetch the deleted account
+            setTimeout(() => {
+                setAccounts(prevAccounts => prevAccounts.filter(account => account.id !== id));
+            }, 100);
+
+            return { success: true };
+        } catch (err: any) {
+            const errorMessage = err.message || "Failed to delete account";
+            setAccountsError(errorMessage);
+            return { success: false, error: errorMessage };
+        }
+    }
+
+    const value = useMemo(() => ({
+        accounts,
+        accountsLoading,
         accountsError,
         refreshAccounts,
         signUp,
         getAccount,
-        updateAccountData
+        updateAccountData,
+        deleteAccount
     }), [accounts, accountsLoading, accountsError]);
 
     if (accountsLoading) {

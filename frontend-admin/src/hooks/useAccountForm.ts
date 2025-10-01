@@ -13,18 +13,18 @@ interface AccountFormData {
 export function useAccountForm() {
     const router = useRouter();
     const { signUp } = useAccounts();
-    
+
     // Form state
     const [formData, setFormData] = useState<AccountFormData>({
         username: "",
         password: "",
         role: "",
     });
-    
+
     // Places state
     const [places, setPlaces] = useState<Place[]>([]);
     const [selectedPlaces, setSelectedPlaces] = useState<Place[]>([]);
-    
+
     // UI state
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -124,9 +124,7 @@ export function useAccountForm() {
                 setSelectedPlaces([]);
 
                 // Navigate back after success
-                setTimeout(() => {
-                    router.push('/accounts');
-                }, 1500);
+                router.push('/listaccounts');
             } else {
                 setError(result.error || "เกิดข้อผิดพลาดในการสร้างบัญชี");
             }
@@ -150,15 +148,15 @@ export function useAccountForm() {
         formData,
         places,
         selectedPlaces,
-        
+
         // UI state
         isLoading,
         error,
         success,
-        
+
         // Computed values
         availablePlaces: getAvailablePlaces(),
-        
+
         // Actions
         handleInputChange,
         handlePlaceSelect,

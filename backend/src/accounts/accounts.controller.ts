@@ -1,4 +1,4 @@
-import { Body, Controller, DefaultValuePipe, Get, Param, ParseIntPipe, Put, Query } from '@nestjs/common';
+import { Body, Controller, DefaultValuePipe, Param, ParseIntPipe, Query, Get, Put, Delete } from '@nestjs/common';
 import { AccountsService, UpdateAccountPayload } from './accounts.service';
 
 @Controller('accounts')
@@ -8,8 +8,8 @@ export class AccountsController {
 
     @Get('get-allaccounts')
     async getAllAccounts(
-        @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number = 5,
-        @Query('limit', new DefaultValuePipe(5), ParseIntPipe) limit: number = 5,
+        @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
+        @Query('limit', new DefaultValuePipe(99999), ParseIntPipe) limit: number = 99999,
     ) {
         return this.accountsService.findAllAccounts(page, limit);
     }
@@ -27,5 +27,9 @@ export class AccountsController {
         return this.accountsService.updateAccount(id, updateData);
     }
 
-    
+    @Delete(':id')
+    async deleteAccount(@Param('id') id: string) {
+        return this.accountsService.deleteAccount(id);
+    }
+
 }

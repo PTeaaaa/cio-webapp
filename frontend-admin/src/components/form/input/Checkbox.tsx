@@ -12,15 +12,14 @@ interface CheckboxProps {
 const Checkbox = ({ label, checked, className, id, onChange, disabled }: CheckboxProps) => {
   return (
     <label
-      className={`flex items-center space-x-3 group cursor-pointer ${
-        disabled ? "cursor-not-allowed opacity-60" : ""
-      }`}
+      className={`flex items-center space-x-3 group cursor-pointer ${disabled ? "cursor-not-allowed opacity-60" : ""
+        }`}
     >
       <div className="relative w-5 h-5">
         <input
           id={id}
           type="checkbox"
-          className={`w-5 h-5 appearance-none cursor-pointer dark:border-gray-700 border border-gray-300 checked:border-transparent rounded-md checked:bg-brand-500 disabled:opacity-60 
+          className={`w-5 h-5 appearance-none cursor-pointer dark:border-gray-700 border border-gray-300 checked:border-transparent rounded-md checked:bg-green-600 disabled:opacity-60 ease-in-out duration-200
           ${className}`}
           checked={checked}
           onChange={(e) => onChange(e.target.checked)}

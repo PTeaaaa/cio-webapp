@@ -1,4 +1,4 @@
-import { PlaceForm, PlacesResponse, PlaceSearchResult, PersonForm } from "@/types";
+import { PlaceForm, PlaceSearchResult, PersonForm } from "@/types";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL || 'http://localhost:3003';
 

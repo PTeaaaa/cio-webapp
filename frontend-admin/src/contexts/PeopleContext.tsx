@@ -23,10 +23,10 @@ interface PeopleContextType {
 
 const PeopleContext = createContext<PeopleContextType | undefined>(undefined);
 
-export function PeopleProvider({ 
+export function PeopleProvider({
   children,
   initialPlaceId,
-}: { 
+}: {
   children: ReactNode,
   initialPlaceId?: string,
 }) {
@@ -93,12 +93,16 @@ export function PeopleProvider({
   };
 
   const deletePerson = async (id: string) => {
+    console.log("[PeopleContext] deletePerson called", { id, hasPlaceContext: Boolean(placeId) });
     try {
       setLoading(true);
       await apiDeletePerson(id);
+      console.log("[PeopleContext] deletePerson api succeeded", { id });
       refetchPeople(); // รีเฟรชข้อมูลทั้งหมดหลังจากลบสำเร็จ
     } catch (err: any) {
-      setError(err.message || `Failed to delete person with ID: ${id}`);
+      const errorMessage = err.message || `Failed to delete person with ID: ${id}`;
+      console.error("[PeopleContext] deletePerson api failed", { id, errorMessage });
+      setError(errorMessage);
       throw err;
     } finally {
       setLoading(false);
