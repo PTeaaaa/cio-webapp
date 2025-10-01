@@ -3,24 +3,32 @@
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import DataEditCard from "@/components-my/edit/account/DataEditCard";
 import React from "react";
-import { PeopleProvider, usePeople } from "@/contexts/PeopleContext";
 import { useSearchParams, useRouter } from "next/navigation";
+import { useAccounts } from "@/contexts/AccountsContext";
 
-function EditAccountPageContent() {
+export default function EditAccountPageContent() {
 
     const searchParams = useSearchParams();
     const router = useRouter();
     const personID = searchParams.get('id');
-    const { deletePerson: contextDeletePerson } = usePeople();
+    const { deleteAccount } = useAccounts();
 
     const handleDelete = async () => {
-        if (personID) {
-            try {
-                await contextDeletePerson(personID);
-                router.push('/listpeople/a047900b-a8dd-462e-b815-55152883e1a6');
-            } catch (error) {
-                console.error("Failed to delete person:", error);
-            }
+        if (!personID) {
+            console.warn("[EditAccountPage] handleDelete triggered without personID search param");
+            return;
+        }
+
+        console.log("[EditAccountPage] attempting delete", { personID });
+
+        try {
+            await deleteAccount(personID, () => {
+                // Navigate immediately when deletion succeeds
+                router.replace('/listaccounts');
+            });
+            console.log("[EditAccountPage] delete succeeded", { personID });
+        } catch (error) {
+            console.error("[EditAccountPage] delete failed", { personID, error });
         }
     };
 
@@ -41,16 +49,5 @@ function EditAccountPageContent() {
                 </div>
             </div>
         </div>
-    );
-}
-
-export default function EditPage() {
-    const searchParams = useSearchParams();
-    const placeId = searchParams.get('placeId');
-
-    return (
-        <PeopleProvider initialPlaceId={placeId || undefined}>
-            <EditAccountPageContent />
-        </PeopleProvider>
     );
 }

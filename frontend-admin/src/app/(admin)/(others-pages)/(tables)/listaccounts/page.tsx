@@ -2,7 +2,7 @@
 
 import ComponentCard from "@/components/common/ComponentCard";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
-import ListPeopleTable from "@/components-my/tables/ListAccountTable";
+import ListAccountTable from "@/components-my/tables/ListAccountTable";
 import React from "react";
 import { Plus } from "lucide-react";
 
@@ -13,7 +13,7 @@ export default function ListPeople() {
       <PageBreadcrumb pageTitle="ข้อมูลของคุณ" />
       <div className="space-y-6">
         <ComponentCard title={"ข้อมูลบัญชีผู้ใช้"}>
-          <ListPeopleTable />
+          <ListAccountTable />
           <div className="flex justify-end">
             <a
               href="/addaccount"

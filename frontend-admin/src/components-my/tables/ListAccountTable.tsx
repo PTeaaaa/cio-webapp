@@ -75,7 +75,7 @@ export default function ListAccountTable() {
                                     isHeader
                                     className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                                 >
-                                    เวลาที่ล็อกอินล่าสุด
+                                    สถานะการใช้งาน
                                 </TableCell>
                                 <TableCell
                                     isHeader
@@ -142,7 +142,7 @@ export default function ListAccountTable() {
                                                 <span className="font-medium text-gray-800 text-theme-sm dark:text-white/90" style={{ whiteSpace: "nowrap" }}>
                                                     {order.username}
                                                 </span>
-                                                
+
                                                 <span className="block text-gray-500 text-theme-xs dark:text-gray-400">
                                                 </span>
                                             </div>
@@ -163,7 +163,7 @@ export default function ListAccountTable() {
                                     <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                                         <div className="flex -space-x-2">
                                             <div className="dark:border-gray-900">
-                                                ไม่มีข้อมูล
+                                                {order.modifiedBy}
                                             </div>
                                         </div>
                                     </TableCell>

@@ -11,7 +11,7 @@ export default function Header() {
     setSearchQuery(query);
     // You can add additional search logic here if needed
   };
-  
+
   return (
     <header className="bg-[#14774a] lg:h-[150px] text-white font-prompt font-light normal-case relative overflow-visible z-[11] w-full">
       <div className="flex flex-col lg:flex-row items-center lg:items-center lg:justify-between gap-0  lg:gap-4 lg:px-[30px] w-full">

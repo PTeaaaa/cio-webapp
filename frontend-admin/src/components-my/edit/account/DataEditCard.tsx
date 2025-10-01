@@ -231,14 +231,14 @@ export default function DataEditCard() {
                             </p>
                         </div>
 
-                        <div className="mt-4">
+                        {/* <div className="mt-4">
                             <button
                                 className="flex w-full items-center justify-center gap-2 rounded-full border border-green-600 px-4 py-3 text-sm font-medium text-black shadow-theme-xs hover:bg-green-600 dark:border-green-700 dark:text-white dark:hover:bg-green-700 dark:hover:text-gray-200 lg:inline-flex lg:w-auto duration-200 ease-in-out"
                                 onClick={() => { }}
                             >
                                 เปลี่ยนรหัสผ่านของบัญชีนี้
                             </button>
-                        </div>
+                        </div> */}
 
                     </div>
                 </div>

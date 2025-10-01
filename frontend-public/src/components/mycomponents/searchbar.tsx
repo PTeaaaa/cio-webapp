@@ -9,7 +9,7 @@ interface SearchResult {
     path: string;
 }
 
-export default function SearchBar({ onSearch, debounceTime = 300, placeholder = "Search..." }: { onSearch: (input: string) => void, debounceTime?: number, placeholder?: string }) {
+export default function SearchBar({ onSearch, debounceTime = 300, placeholder = "ค้นหา..." }: { onSearch: (input: string) => void, debounceTime?: number, placeholder?: string }) {
     const [input, setInput] = useState("");
     const [results, setResults] = useState<SearchResult[]>([]);
     const [showResults, setShowResults] = useState(false);
@@ -89,12 +89,20 @@ export default function SearchBar({ onSearch, debounceTime = 300, placeholder = 
                 <Link
                     href="/filter"
                     title="การค้นหาขั้นสูง"
+                    className={`${expanded ? "-mr-7" : "mr-3"} hover:cursor-pointer inline-flex items-center justify-center w-14 h-14 rounded`}
+                >
+                    <IoFilterCircle className="w-11 h-11" />
+                </Link>
+
+                {/* <Link
+                    href="/filter"
+                    title="การค้นหาขั้นสูง"
                     className={`${expanded ? "-mr-7" : "mr-3"} hover:cursor-pointer inline-flex items-center justify-center w-9 h-9 rounded`}
                 >
                     <IoFilterCircle className="w-9 h-9" />
-                </Link>
+                </Link> */}
 
-                {/* Search icon button */}
+                {/* Search icon button
                 <button
                     className={`bg-white rounded-full shadow flex items-center justify-end focus:outline-none z-10
                         ${expanded ? 'w-10 h-10 p-0 opacity-0 scale-0' : 'w-10 h-10 p-2 opacity-100 scale-100'}
@@ -104,10 +112,10 @@ export default function SearchBar({ onSearch, debounceTime = 300, placeholder = 
                     tabIndex={expanded ? -1 : 0}
                 >
                     <Search className="text-[#14774a] w-6 h-6" />
-                </button>
+                </button> */}
 
                 {/* Expanded search input */}
-                <div
+                {/* <div
                     className={`flex items-center bg-white rounded-full shadow 
                         ${expanded
                             ? 'h-10 w-48 sm:w-64 px-3 py-1 mt-[6px] lg:mt-0 opacity-100 scale-100'
@@ -128,7 +136,7 @@ export default function SearchBar({ onSearch, debounceTime = 300, placeholder = 
                         tabIndex={expanded ? 0 : -1}
                     />
                     <Search className={`text-[#14774a] transition-all duration-300 ${expanded ? 'ml-2 w-5 h-5' : 'w-0 h-0'}`} />
-                </div>
+                </div> */}
             </div>
             {/* Results dropdown */}
             <div

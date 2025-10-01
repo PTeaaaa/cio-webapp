@@ -104,7 +104,7 @@ export class AccountsService {
 
             // Update account data
             const { assignedPlaces, ...accountData } = updateData;
-            
+
             const updatedAccount = await this.prisma.$transaction(async (prisma) => {
                 // Update account basic info
                 const account = await prisma.account.update({
@@ -153,6 +153,38 @@ export class AccountsService {
             }
             const errorMessage = error instanceof Error ? error.message : String(error);
             throw new InternalServerErrorException(`Failed to update account: ${errorMessage}`);
+        }
+    }
+
+    async deleteAccount(id: string) {
+        try {
+            const existingAccount = await this.prisma.account.findUnique({
+                where: { id }
+            });
+
+            if (!existingAccount) {
+                throw new NotFoundException(`Account with ID ${id} not found`);
+            }
+
+            await this.prisma.$transaction(async (prisma) => {
+                // Delete assigned places
+                await prisma.accountPlace.deleteMany({
+                    where: { accountId: id }
+                });
+
+                // Delete the account
+                await prisma.account.delete({
+                    where: { id }
+                });
+            });
+
+            return { message: `Account with ID ${id} deleted successfully` };
+        } catch (error: unknown) {
+            if (error instanceof NotFoundException) {
+                throw error;
+            }
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            throw new InternalServerErrorException(`Failed to delete account: ${errorMessage}`);
         }
     }
 }

@@ -106,3 +106,20 @@ export const createAccount = async (signupData: SignupPayload): Promise<SignupRe
         throw error;
     }
 };
+
+export const deleteAccount = async (id: string): Promise<void> => {
+    try {
+        const response = await apiFetch(`/accounts/${id}`, {
+            method: 'DELETE',
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || `Failed to delete account. Status: ${response.status}`);
+        }
+
+    } catch (error) {
+        console.error("Error in deleteAccount:", error);
+        throw error;
+    }
+};

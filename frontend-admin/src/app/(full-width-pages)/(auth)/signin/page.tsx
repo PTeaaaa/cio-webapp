@@ -15,7 +15,7 @@ export default function SignIn() {
       <AuthRedirect />
       <SignInForm />
       <div className="lg:w-1/2 w-full h-full bg-[#033500] dark:bg-white/5 lg:grid items-center hidden">
-        <div className="relative items-center justify-center  flex z-1">
+        <div className="relative items-center justify-center flex z-1">
           {/* <!-- ===== Common Grid Shape Start ===== --> */}
           <GridShape />
           <div className="flex flex-col items-center max-w-xs">

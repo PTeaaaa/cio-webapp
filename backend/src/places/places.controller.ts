@@ -1,4 +1,4 @@
-import { Controller, DefaultValuePipe, Get, Param, ParseUUIDPipe, Query, ParseIntPipe } from '@nestjs/common';
+import { Controller, DefaultValuePipe, Get, Param, ParseUUIDPipe, Query, ParseIntPipe, Post, Body, Delete } from '@nestjs/common';
 import { PlacesService } from './places.service';
 
 @Controller('places')
@@ -22,5 +22,20 @@ export class PlacesController {
         @Query('limit', new DefaultValuePipe(5), ParseIntPipe) limit: number = 5,
     ) {
         return this.placesService.getPlacesByAgency(agency, page, limit);
+    }
+
+    @Post('create-places')
+    createManyPlaces(@Body() placesData: { name: string; agency: string }[]) {
+        return this.placesService.createManyPlaces(placesData);
+    }
+
+    @Delete('delete/:id')
+    deletePlaceById(@Param('id', new ParseUUIDPipe()) id: string) {
+        return this.placesService.deletePlaceById(id);
+    }
+
+    @Delete('delete-many')
+    deleteManyPlaces(@Body() placeIds: string[]) {
+        return this.placesService.deleteManyPlaces(placeIds);
     }
 }

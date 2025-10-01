@@ -19,6 +19,7 @@ export default function SignInForm() {
   const searchParams = useSearchParams();
   const nextParam = searchParams?.get("next") || "";
 
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -57,6 +58,23 @@ export default function SignInForm() {
       console.error("Login submission error:", error);
       setError("เกิดข้อผิดพลาดในการเข้าสู่ระบบ");
     }
+  };
+
+  const handleOAuthLogin = () => {
+    // Simulate OAuth provider redirect
+    // In a real implementation, this would redirect to the actual OAuth provider
+    // For now, we'll simulate the OAuth flow by redirecting to the callback page with a mock code
+    const mockCode = 'valid_mock_code';
+    const callbackUrl = `${window.location.origin}/callback?code=${mockCode}`;
+
+    console.log("Initiating OAuth flow, redirecting to:", callbackUrl);
+
+    // In a real OAuth flow, you would redirect to the OAuth provider like:
+    // const oauthProviderUrl = `https://oauth-provider.com/authorize?client_id=YOUR_CLIENT_ID&redirect_uri=${encodeURIComponent(callbackUrl)}&response_type=code&scope=read`;
+    // window.location.href = oauthProviderUrl;
+
+    // For demo purposes, we'll simulate the callback by redirecting to the callback page
+    window.location.href = callbackUrl;
   };
 
   return (
@@ -122,16 +140,18 @@ export default function SignInForm() {
                       จดจำฉันไว้ในระบบ
                     </span>
                   </div>
-                  <Link
+
+                  {/* <Link
                     href="/reset-password"
                     className="text-sm text-brand-500 hover:text-brand-600 dark:text-brand-400"
                   >
                     ลืมรหัสผ่าน?
-                  </Link>
+                  </Link> */}
+
                 </div>
                 <div>
                   <button
-                    className="w-full flex items-center justify-center px-4 py-3 text-sm font-medium text-white transition rounded-lg bg-brand-500 shadow-theme-xs hover:bg-brand-600 disabled:bg-brand-300"
+                    className="w-full flex items-center justify-center px-4 py-3 text-sm font-medium text-white transition rounded-lg bg-green-600 shadow-theme-xs hover:bg-green-700 disabled:bg-gray-400"
                     type="submit"
                     disabled={isLoading}
                   >
@@ -141,16 +161,15 @@ export default function SignInForm() {
               </div>
             </form>
 
-            <div className="mt-5">
-              <p className="text-sm font-normal text-center text-gray-700 dark:text-gray-400 sm:text-start">
-                Don&apos;t have an account?&nbsp;
-                <Link
-                  href="/signup"
-                  className="text-brand-500 hover:text-brand-600 dark:text-brand-400"
-                >
-                  Sign Up
-                </Link>
-              </p>
+            <div className="border-t-1 mt-5 border-gray-400">
+              <button
+                className="w-full flex items-center justify-center px-4 py-3 text-sm font-medium text-white transition rounded-lg border border-green-600 shadow-theme-xs hover:bg-green-600 disabled:bg-gray-400 mt-5 ease-in-out duration-400"
+                type="button"
+                onClick={handleOAuthLogin}
+                disabled={isLoading}
+              >
+                {isLoading ? "กำลังเข้าสู่ระบบ..." : "ลงชื่อเข้าใช้ด้วยระบบ OAuth"}
+              </button>
             </div>
 
           </div>
