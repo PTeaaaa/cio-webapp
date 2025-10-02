@@ -32,8 +32,7 @@ export function useEditInfoCard() {
         // ตรวจสอบว่า personID ถูกต้องหรือไม่
         if (!personID || personID === "default") {
             console.error('No valid person ID found in URL.');
-            router.push(`/listpeople/asdf`);
-            // /edit?id=${personID}&placeId=${placeId}
+            router.replace("/not-found");
             return;
         }
 
@@ -45,7 +44,7 @@ export function useEditInfoCard() {
 
         // หากข้อมูล people โหลดแล้ว ให้ค้นหาบุคคล
         const foundPerson = people.find(p => p.id === personID);
-        
+
         if (foundPerson) {
             // สร้าง object PersonForm เพื่อใช้ตั้งค่า state
             const personFormData: PersonForm = {
@@ -58,7 +57,7 @@ export function useEditInfoCard() {
                 position: foundPerson.position || "",
                 imageUrl: foundPerson.imageUrl,
                 placeId: foundPerson.placeId || "",
-                department:foundPerson.department,
+                department: foundPerson.department,
                 year: foundPerson.year,
             };
 
@@ -77,7 +76,7 @@ export function useEditInfoCard() {
         } else {
             console.error(`Person with ID ${personID} not found!`);
             // หากไม่พบบุคคล ให้ redirect ไปหน้า not-found
-            router.push(`/listpeople/asdf`);
+            router.replace("/not-found");
             setLoading(false); // ตั้งค่า loading เป็น false เพื่อหยุดการโหลด
         }
     }, [personID, people, contextLoading, router]);
