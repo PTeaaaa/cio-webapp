@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useModal } from "../../../hooks/useModal";
 import { Modal } from "@/components/ui/modal";
-import { ConfirmationCard } from "@/components/ui/modal/ConfirmationCard";
+import { ConfirmationCard } from "@/components/ui/modal/ConfirmationModal";
 import Button from "@/components/ui/button/Button";
 import Input from "@/components/form/input/InputField";
 import Label from "@/components/form/Label";
@@ -173,9 +173,9 @@ export default function mockupInfoEditCard() {
                 </button>
             </div>
 
-            <Modal 
-                isOpen={isOpen} 
-                onClose={handleCloseAttempt} 
+            <Modal
+                isOpen={isOpen}
+                onClose={handleCloseAttempt}
                 className="max-w-[700px] m-4"
                 hasUnsavedChanges={hasUnsavedChanges()}
                 onConfirmClose={handleCloseAttempt}
@@ -208,8 +208,8 @@ export default function mockupInfoEditCard() {
 
                                     <div>
                                         <Label>X.com</Label>
-                                        <Input 
-                                            type="text" 
+                                        <Input
+                                            type="text"
                                             defaultValue={formData.twitter}
                                             onChange={(e) => handleInputChange('twitter', e.target.value)}
                                         />
@@ -242,8 +242,8 @@ export default function mockupInfoEditCard() {
                                 <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                                     <div className="col-span-2 lg:col-span-1">
                                         <Label>ชื่อ</Label>
-                                        <Input 
-                                            type="text" 
+                                        <Input
+                                            type="text"
                                             defaultValue={formData.firstName}
                                             onChange={(e) => handleInputChange('firstName', e.target.value)}
                                         />
@@ -251,8 +251,8 @@ export default function mockupInfoEditCard() {
 
                                     <div className="col-span-2 lg:col-span-1">
                                         <Label>นามสกุล</Label>
-                                        <Input 
-                                            type="text" 
+                                        <Input
+                                            type="text"
                                             defaultValue={formData.lastName}
                                             onChange={(e) => handleInputChange('lastName', e.target.value)}
                                         />
@@ -260,8 +260,8 @@ export default function mockupInfoEditCard() {
 
                                     <div className="col-span-2 lg:col-span-1">
                                         <Label>อีเมล</Label>
-                                        <Input 
-                                            type="email" 
+                                        <Input
+                                            type="email"
                                             defaultValue={formData.email}
                                             onChange={(e) => handleInputChange('email', e.target.value)}
                                         />
@@ -269,8 +269,8 @@ export default function mockupInfoEditCard() {
 
                                     <div className="col-span-2 lg:col-span-1">
                                         <Label>เบอร์โทรศัพท์</Label>
-                                        <Input 
-                                            type="text" 
+                                        <Input
+                                            type="text"
                                             defaultValue={formData.phone}
                                             onChange={(e) => handleInputChange('phone', e.target.value)}
                                         />
@@ -278,8 +278,8 @@ export default function mockupInfoEditCard() {
 
                                     <div className="col-span-2">
                                         <Label>ตำแหน่ง</Label>
-                                        <Input 
-                                            type="text" 
+                                        <Input
+                                            type="text"
                                             defaultValue={formData.position}
                                             onChange={(e) => handleInputChange('position', e.target.value)}
                                         />

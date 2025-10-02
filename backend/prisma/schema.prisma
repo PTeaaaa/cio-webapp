@@ -84,8 +84,10 @@ model Person {
   placeId     String?
   department  String
   year        Int
+
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+  modifiedBy  String? // New Column, don't forget to make a new migrate
 
   placements  PersonPlacement[]
 

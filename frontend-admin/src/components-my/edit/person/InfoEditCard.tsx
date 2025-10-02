@@ -1,7 +1,7 @@
 // ไฟล์: InfoEditCard.tsx
 import React from "react";
 import { Modal } from "../../../components/ui/modal";
-import { ConfirmationCard } from "../../../components/ui/modal/ConfirmationCard";
+import { ConfirmationCard } from "../../../components/ui/modal/ConfirmationModal";
 import Button from "../../../components/ui/button/Button";
 import Input from "../../../components/form/input/InputField";
 import Label from "../../../components/form/Label";

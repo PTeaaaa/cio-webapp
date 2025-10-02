@@ -1,7 +1,7 @@
 // ไฟล์: DataEditCard.tsx
 import React, { useState, useEffect } from "react";
 import { Modal } from "../../../components/ui/modal";
-import { ConfirmationCard } from "../../../components/ui/modal/ConfirmationCard";
+import { ConfirmationCard } from "../../../components/ui/modal/ConfirmationModal";
 import Button from "../../../components/ui/button/Button";
 import Input from "../../../components/form/input/InputField";
 import Label from "../../../components/form/Label";
@@ -103,7 +103,7 @@ export default function DataEditCard() {
                         ข้อมูลบัญชี
                     </h4>
 
-                    <div className="grid grid-cols-1 pt-4 gap-3 lg:gap-10 lg:gap-x-40">
+                    <div className="grid grid-cols-1 md:grid-cols-2 pt-4 gap-10 lg:gap-x-40">
                         {/* ส่วนแสดงข้อมูล */}
 
                         <div>

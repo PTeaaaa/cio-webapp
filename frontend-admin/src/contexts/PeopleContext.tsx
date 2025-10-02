@@ -18,7 +18,7 @@ interface PeopleContextType {
   refetchPeople: () => void;
   addPerson: (person: CreatePersonPayload) => Promise<void>;
   updatePerson: (id: string, person: UpdatePersonPayload) => Promise<void>;
-  deletePerson: (id: string) => Promise<void>;
+  deletePerson: (id: string, onSuccess?: () => void) => Promise<{ success: boolean; error?: string }>;
 }
 
 const PeopleContext = createContext<PeopleContextType | undefined>(undefined);
@@ -92,20 +92,28 @@ export function PeopleProvider({
     }
   };
 
-  const deletePerson = async (id: string) => {
-    console.log("[PeopleContext] deletePerson called", { id, hasPlaceContext: Boolean(placeId) });
+  const deletePerson = async (id: string, onSuccess?: () => void): Promise<{ success: boolean; error?: string }> => {
     try {
-      setLoading(true);
+      setError(null);
       await apiDeletePerson(id);
-      console.log("[PeopleContext] deletePerson api succeeded", { id });
-      refetchPeople(); // รีเฟรชข้อมูลทั้งหมดหลังจากลบสำเร็จ
+
+      // Call the success callback immediately (for navigation)
+      if (onSuccess) {
+        onSuccess();
+      }
+
+      // Delay state update to allow navigation to complete first
+      // This prevents the edit page from trying to refetch the deleted person
+      setTimeout(() => {
+        setPeople(prevPeople => prevPeople.filter(person => person.id !== id));
+      }, 100);
+
+      return { success: true };
     } catch (err: any) {
       const errorMessage = err.message || `Failed to delete person with ID: ${id}`;
       console.error("[PeopleContext] deletePerson api failed", { id, errorMessage });
       setError(errorMessage);
-      throw err;
-    } finally {
-      setLoading(false);
+      return { success: false, error: errorMessage };
     }
   };
 
