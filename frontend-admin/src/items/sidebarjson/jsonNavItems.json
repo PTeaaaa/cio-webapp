@@ -2,25 +2,25 @@
     "navItems": [
         {
             "icon": "House",
-            "name": "Home",
+            "name": "หน้าแรก",
             "path": "/"
         },
         {
-            "icon": "MapPinHouse",
-            "name": "สถานที่ของคุณ"
+            "icon": "BookUser",
+            "name": "ข้อมูลของคุณ"
         },
         {
-            "icon": "Contact",
-            "name": "ข้อมูลบัญชีผู้ใช้",
-            "path": "/listaccounts",
+            "icon": "HousePlus",
+            "name": "ข้อมูลสถานที่",
+            "path": "/listplaces",
             "role": [
                 "admin"
             ]
         },
         {
-            "icon": "HousePlus",
-            "name": "เพิ่มสถานที่ใหม่",
-            "path": "/addplace",
+            "icon": "Contact",
+            "name": "ข้อมูลบัญชีผู้ใช้",
+            "path": "/listaccounts",
             "role": [
                 "admin"
             ]

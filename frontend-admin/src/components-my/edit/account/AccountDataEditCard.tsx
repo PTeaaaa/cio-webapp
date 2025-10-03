@@ -10,7 +10,7 @@ import { useAccounts } from "@/contexts/AccountsContext";
 import { getAllPlaces } from "@/services/places/placesAPI";
 import { Place } from "@/types";
 
-export default function DataEditCard() {
+export default function AccountDataEditCard() {
     const {
         isOpen,
         openModal,

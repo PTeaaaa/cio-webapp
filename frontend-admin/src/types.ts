@@ -38,6 +38,8 @@ export interface Place {
     agency: string;
 }
 
+export type UpdatePlacePayload = Partial<Omit<Place, "id">>;
+
 export type User = {
     id: string;
     username?: string;

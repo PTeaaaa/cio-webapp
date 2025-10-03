@@ -8,15 +8,12 @@ import {
   ChevronDownIcon,
   HorizontaLDots,
 } from "../icons/index";
-import { House, MapPinHouse, Pencil, DoorClosed, UserCircleIcon, ListIcon, TableIcon, PieChartIcon, Contact, HousePlus } from "lucide-react";
+import { House, MapPinHouse, Pencil, DoorClosed, UserCircleIcon, ListIcon, TableIcon, PieChartIcon, Contact, HousePlus, BookUser } from "lucide-react";
 import { CalenderIcon, PageIcon, BoxCubeIcon, PlugInIcon } from "@/icons/index";
 import { useNavigation } from "@/contexts/NavigationContext";
 
 const iconMap = {
   House,
-  MapPinHouse,
-  Pencil,
-  DoorClosed,
   CalenderIcon,
   UserCircleIcon,
   ListIcon,
@@ -26,7 +23,8 @@ const iconMap = {
   BoxCubeIcon,
   PlugInIcon,
   Contact,
-  HousePlus
+  HousePlus,
+  BookUser
 }
 
 type NavItem = {
@@ -159,6 +157,7 @@ const AppSidebar = () => {
                           }`}
                       >
                         {subItem.name}
+
                         <span className="flex items-center gap-1 ml-auto">
                           {subItem.new && (
                             <span

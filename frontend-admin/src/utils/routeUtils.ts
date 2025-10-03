@@ -25,8 +25,10 @@ export const ROUTE_PERMISSIONS: Record<string, string[]> = {
 
     // User/Admin routes
     "/listpeople": ["admin", "user"],
-    "/edit": ["admin", "user"],
+    "/edit-person": ["admin", "user"],
+    "/edit-place": ["admin", "user"],
     "/addnew": ["admin", "user"],
+    "/listplaces": ["admin"],
 
 
     // ---------------- Example ---------------- //

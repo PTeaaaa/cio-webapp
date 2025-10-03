@@ -89,7 +89,7 @@ export class PeopleService {
         return person;
     }
 
-    async createPerson( createPersonDto: CreatePersonDto) {
+    async createPerson(createPersonDto: CreatePersonDto) {
 
         try {
             const { placeId, ...personData } = createPersonDto;

@@ -52,7 +52,7 @@ export default function ListAccountTable() {
     return (
         <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
             <div className="max-w-full overflow-x-auto">
-                <div className="min-w-[1102px]">
+                <div className="min-w-full">
                     <Table>
                         {/* Table Header */}
                         <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
@@ -73,26 +73,26 @@ export default function ListAccountTable() {
 
                                 <TableCell
                                     isHeader
-                                    className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                                    className="px-5 py-3 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400"
                                 >
                                     สถานะการใช้งาน
                                 </TableCell>
                                 <TableCell
                                     isHeader
-                                    className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                                    className="px-5 py-3 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400"
                                 >
                                     ผู้จัดการข้อมูลล่าสุด
                                 </TableCell>
                                 <TableCell
                                     isHeader
-                                    className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                                    className="px-5 py-3 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400"
                                 >
                                     วันที่อัปเดตข้อมูลล่าสุด (วัน/เดือน/ปี)
                                 </TableCell>
 
                                 <TableCell
                                     isHeader
-                                    className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400 hidden lg:block"
+                                    className="px-5 py-3 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400 hidden lg:block"
                                 >
                                     <span className="sr-only">Editing</span>
                                 </TableCell>
@@ -138,18 +138,17 @@ export default function ListAccountTable() {
                                                     className="w-12 h-12 object-cover rounded-full"
                                                 />
                                             </div>
+
                                             <div>
                                                 <span className="font-medium text-gray-800 text-theme-sm dark:text-white/90" style={{ whiteSpace: "nowrap" }}>
                                                     {order.username}
                                                 </span>
-
-                                                <span className="block text-gray-500 text-theme-xs dark:text-gray-400">
-                                                </span>
                                             </div>
+
                                         </div>
                                     </TableCell>
 
-                                    <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                                    <TableCell className="px-4 py-3 text-gray-500 text-center text-theme-sm dark:text-gray-400">
                                         <Badge
                                             size="sm"
                                             color={
@@ -160,7 +159,7 @@ export default function ListAccountTable() {
                                         </Badge>
                                     </TableCell>
 
-                                    <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                                    <TableCell className="px-4 py-3 text-gray-500 text-center text-theme-sm dark:text-gray-400">
                                         <div className="flex -space-x-2">
                                             <div className="dark:border-gray-900">
                                                 {order.modifiedBy}
@@ -168,11 +167,11 @@ export default function ListAccountTable() {
                                         </div>
                                     </TableCell>
 
-                                    <TableCell className="px-4 py-3 text-gray-500 text-theme-sm dark:text-gray-400">
+                                    <TableCell className="px-4 py-3 text-gray-500 text-center text-theme-sm dark:text-gray-400">
                                         {new Date(order.updatedAt).toLocaleDateString('th-TH')}
                                     </TableCell>
 
-                                    <TableCell className="px-4 py-5 text-gray-500 text-start text-theme-sm dark:text-gray-400 hidden lg:block">
+                                    <TableCell className="px-4 py-5 text-gray-500 text-center text-theme-sm dark:text-gray-400 hidden lg:block">
                                         <Link
                                             href={`/edit-account?id=${order.id}`}
                                             className="flex w-fit items-center justify-center gap-2 rounded-full border border-gray-300 bg-white px-3 py-3 text-sm font-medium text-gray-700 shadow-theme-xs hover:bg-gray-50 hover:text-gray-800 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] dark:hover:text-gray-200"

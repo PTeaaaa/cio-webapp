@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException, BadRequestException, InternalServerErrorException, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { UpdatePlaceDto } from './dto/update-place.dto';
 
 @Injectable()
 export class PlacesService {
@@ -250,6 +251,19 @@ export class PlacesService {
         }
     }
 
+    async updatePlaceById(id: string, placeData: UpdatePlaceDto) {
+        try {
+            const updatedPlace = await this.prisma.place.update({
+                where: { id },
+                data: placeData,
+            });
+            return updatedPlace;
+        } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            throw new InternalServerErrorException(`Failed to update place: ${errorMessage}`);
+        }
+    }
+
     async deleteManyPlaces(placeIds: string[]) {
         if (!placeIds || placeIds.length === 0) {
             throw new BadRequestException('Place IDs are required and cannot be empty');
@@ -333,4 +347,6 @@ export class PlacesService {
             throw new InternalServerErrorException(`Failed to delete places: ${errorMessage}`);
         }
     }
+
+
 }

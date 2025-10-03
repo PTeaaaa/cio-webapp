@@ -1,7 +1,7 @@
 "use client";
 
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
-import DataEditCard from "@/components-my/edit/account/DataEditCard";
+import DataEditCard from "@/components-my/edit/account/AccountDataEditCard";
 import React from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useAccounts } from "@/contexts/AccountsContext";

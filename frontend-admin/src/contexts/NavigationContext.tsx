@@ -103,7 +103,7 @@ export const NavigationProvider = ({ children }: { children: React.ReactNode }) 
                 const filteredBasicItems = filterNavigationByRole(basicNavItems, undefined);
 
                 // Remove the places item if user is not authenticated
-                const placeIndex = filteredBasicItems.findIndex(item => item.icon === "MapPinHouse");
+                const placeIndex = filteredBasicItems.findIndex(item => item.icon === "BookUser");
                 if (placeIndex !== -1) {
                     filteredBasicItems.splice(placeIndex, 1);
                 }
@@ -125,8 +125,8 @@ export const NavigationProvider = ({ children }: { children: React.ReactNode }) 
                 console.log('NavigationContext: Received sidebar items:', dynamicPlaces);
 
                 const yourPlacesNavItem: NavItem = {
-                    icon: "MapPinHouse",
-                    name: "สถานที่ของคุณ",
+                    icon: "BookUser",
+                    name: "ข้อมูลบุคคล",
                     subItems: dynamicPlaces.map(place => ({
                         name: place.name,
                         path: `/listpeople/${place.id}`,
@@ -136,7 +136,7 @@ export const NavigationProvider = ({ children }: { children: React.ReactNode }) 
                 const navItemsCopy: NavItem[] = [...jsonNavItems.navItems as NavItem[]];
                 console.log('NavigationContext: Initial nav items from JSON:', navItemsCopy);
 
-                const placeIndex = navItemsCopy.findIndex(item => item.icon === "MapPinHouse");
+                const placeIndex = navItemsCopy.findIndex(item => item.icon === "BookUser");
 
                 if (placeIndex !== -1) {
                     if (dynamicPlaces.length > 0) {
@@ -158,7 +158,7 @@ export const NavigationProvider = ({ children }: { children: React.ReactNode }) 
 
                 // Fallback to just the JSON navigation items if API fails
                 const navItemsCopy: NavItem[] = [...jsonNavItems.navItems as NavItem[]];
-                const placeIndex = navItemsCopy.findIndex(item => item.icon === "MapPinHouse");
+                const placeIndex = navItemsCopy.findIndex(item => item.icon === "BookUser");
 
                 // Remove the places item if API failed
                 if (placeIndex !== -1) {
