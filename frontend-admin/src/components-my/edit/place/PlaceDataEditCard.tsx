@@ -6,8 +6,6 @@ import Button from "../../../components/ui/button/Button";
 import Input from "../../../components/form/input/InputField";
 import Label from "../../../components/form/Label";
 import { usePlaceLogic } from "@/hooks/usePlaceLogic";
-import { getAllPlaces } from "@/services/places/placesAPI";
-import { Place } from "@/types";
 
 export default function PlaceDataEditCard() {
     const {

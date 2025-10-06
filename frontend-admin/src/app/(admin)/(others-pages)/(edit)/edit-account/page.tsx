@@ -23,8 +23,8 @@ export default function EditAccountPageContent() {
         }
         try {
             await deleteAccount(accountId, () => {
-                // Navigate immediately when deletion succeeds
-                router.replace('/listaccounts');
+                // Navigate immediately to listaccounts with success parameter
+                router.replace('/listaccounts?deleted=success');
             });
         } catch (error) {
             console.error("Failed to delete account:", { accountId, error });
@@ -43,7 +43,7 @@ export default function EditAccountPageContent() {
                         className="flex w-full items-center justify-center gap-2 rounded-full border border-gray-300 bg-red-600 px-4 py-3 text-sm font-medium text-white shadow-theme-xs hover:bg-red-700 dark:border-gray-700 dark:bg-red-500 dark:text-white dark:hover:bg-red-700 dark:hover:text-gray-200 lg:inline-flex lg:w-auto duration-200 ease-in-out"
                         onClick={deleteModal.openModal}
                     >
-                        ลบรายชื่อและข้อมูลส่วนตัว
+                        ลบบัญชีผู้ใช้นี้
                     </button>
                 </div>
             </div>
