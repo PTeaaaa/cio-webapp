@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { X } from "lucide-react";
 
-interface TimeLimitModalProps {
+interface NotificationProps {
   isOpen: boolean;
   onClose: () => void;
   title?: string;
@@ -63,15 +63,15 @@ const variantStyles = {
   },
 };
 
-export default function TimeLimitModal({
+export default function NotificationModal({
   isOpen,
   onClose,
-  title = "Data deleted successfully",
+  title,
   message,
   autoDismissTime = 5000,
   variant = "success",
   position = "top",
-}: TimeLimitModalProps) {
+}: NotificationProps) {
   const [progress, setProgress] = useState(100);
   const style = variantStyles[variant];
 

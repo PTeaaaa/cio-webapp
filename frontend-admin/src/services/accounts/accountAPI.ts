@@ -11,14 +11,14 @@ interface ApiResponse {
     };
 }
 
-export interface SignupPayload {
+export interface NewAccountPayload {
     username: string;
     password: string;
     role: string;
     assignPlace: string[];
 }
 
-export interface SignupResponse {
+export interface NewAccountResponse {
     message: string;
     user: AccountForm;
 }
@@ -83,22 +83,30 @@ export const updateAccount = async (id: string, updateData: UpdateAccountPayload
     }
 };
 
-export const createAccount = async (signupData: SignupPayload): Promise<SignupResponse | null> => {
+export const createAccount = async (accountData: NewAccountPayload): Promise<NewAccountResponse | null> => {
     try {
-        const response = await apiFetch('/auth/signup', {
+        const response = await apiFetch('/accounts/create', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(signupData),
+            body: JSON.stringify(accountData),
         });
 
         if (!response.ok) {
-            const errorData = await response.json();
+            const errorData = await response.json().catch(() => ({}));
+
+            // Handle duplicate username error specifically
+            if (response.status === 409 && errorData.message?.includes('Username already exists')) {
+                const duplicateError = new Error('Username already exists');
+                (duplicateError as any).isDuplicateUsername = true;
+                throw duplicateError;
+            }
+
             throw new Error(errorData.message || `Failed to create account. Status: ${response.status}`);
         }
 
-        const result: SignupResponse = await response.json();
+        const result: NewAccountResponse = await response.json();
         return result;
 
     } catch (error) {

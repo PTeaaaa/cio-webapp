@@ -1,6 +1,6 @@
-import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
-import { AccountForm } from '@/types';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException, ConflictException } from '@nestjs/common';
 import { PrismaService } from '@/prisma/prisma.service';
+import * as bcrypt from 'bcrypt';
 
 export interface UpdateAccountPayload {
     username?: string;
@@ -13,6 +13,80 @@ export interface UpdateAccountPayload {
 export class AccountsService {
 
     constructor(private readonly prisma: PrismaService) { }
+
+    async createAccount(username: string, password: string, role: string, assignPlace: string[]) {
+        // Validate input
+        if (!username || username.trim().length < 3) {
+            throw new BadRequestException('Username must be at least 3 characters long');
+        }
+
+        if (!password || password.length < 6) {
+            throw new BadRequestException('Password must be at least 6 characters long');
+        }
+
+        if (!['admin', 'user'].includes(role)) {
+            throw new BadRequestException('Invalid role. Must be admin or user');
+        }
+
+        // Check if username already exists
+        const existingAccount = await this.prisma.account.findUnique({
+            where: { username: username.trim() },
+        });
+
+        if (existingAccount) {
+            throw new ConflictException('Username already exists');
+        }
+
+        try {
+            const hashedPassword = await bcrypt.hash(password, 12);
+
+            // Create account with assigned places in a transaction
+            const result = await this.prisma.$transaction(async (prisma) => {
+                // Create the account
+                const account = await prisma.account.create({
+                    data: {
+                        username: username.trim(),
+                        password: hashedPassword,
+                        role,
+                    },
+                });
+
+                // Create account-place relationships if assignPlace is provided
+                if (assignPlace && assignPlace.length > 0) {
+                    // Validate that all place IDs exist
+                    const existingPlaces = await prisma.place.findMany({
+                        where: {
+                            id: { in: assignPlace }
+                        }
+                    });
+
+                    if (existingPlaces.length !== assignPlace.length) {
+                        throw new BadRequestException('One or more place IDs are invalid');
+                    }
+
+                    // Create account-place relationships
+                    await prisma.accountPlace.createMany({
+                        data: assignPlace.map(placeId => ({
+                            accountId: account.id,
+                            placeId: placeId
+                        })),
+                        skipDuplicates: true
+                    });
+                }
+
+                return account;
+            });
+
+            // Return user without password
+            const { password: _, ...accountResult } = result;
+            return accountResult;
+        } catch (error) {
+            if (error instanceof BadRequestException) {
+                throw error;
+            }
+            throw new BadRequestException('Failed to create account');
+        }
+    }
 
     async findAllAccounts(page: number, limit: number) {
         try {

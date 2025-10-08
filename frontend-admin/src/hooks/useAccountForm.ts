@@ -3,6 +3,7 @@ import { useRouter } from 'next/navigation';
 import { getSidebarItems } from '@/services/sidebars/sidebarAPI';
 import { useAccounts } from '@/contexts/AccountsContext';
 import { Place } from '@/types';
+import toast from 'react-hot-toast';
 
 interface AccountFormData {
     username: string;
@@ -12,7 +13,7 @@ interface AccountFormData {
 
 export function useAccountForm() {
     const router = useRouter();
-    const { signUp } = useAccounts();
+    const { createAccount } = useAccounts();
 
     // Form state
     const [formData, setFormData] = useState<AccountFormData>({
@@ -39,7 +40,9 @@ export function useAccountForm() {
             } catch (err: unknown) {
                 const errorMessage = err instanceof Error ? err.message : String(err);
                 console.error("Failed to fetch places for dropdown", errorMessage);
-                setError("ไม่สามารถโหลดหน่วยงานได้ กรุณาลองใหม่ภายหลัง");
+                const errorMsg = "ไม่สามารถโหลดหน่วยงานได้ กรุณาลองใหม่ภายหลัง";
+                setError(errorMsg);
+                toast.error(errorMsg);
             }
         };
         fetchPlaces();
@@ -74,27 +77,40 @@ export function useAccountForm() {
     // Form validation
     const validateForm = (): boolean => {
         if (!formData.username.trim()) {
-            setError("กรุณากรอก Username");
+            const errorMsg = "กรุณากรอก Username";
+            setError(errorMsg);
+            toast.error(errorMsg);
             return false;
         }
         if (formData.username.trim().length < 3) {
-            setError("Username ต้องมีอย่างน้อย 3 ตัวอักษร");
+            const errorMsg = "Username ต้องมีอย่างน้อย 3 ตัวอักษร";
+            setError(errorMsg);
+            toast.error(errorMsg);
             return false;
         }
         if (!formData.password) {
-            setError("กรุณากรอก Password");
+            const errorMsg = "กรุณากรอก Password";
+            setError(errorMsg);
+            toast.error(errorMsg);
             return false;
         }
         if (formData.password.length < 6) {
-            setError("Password ต้องมีอย่างน้อย 6 ตัวอักษร");
+            const errorMsg = "Password ต้องมีอย่างน้อย 6 ตัวอักษร";
+            setError(errorMsg);
+            toast.error(errorMsg);
             return false;
         }
         if (!formData.role) {
-            setError("กรุณาเลือกประเภทของบัญชี");
+            const errorMsg = "กรุณาเลือกประเภทของบัญชี";
+            setError(errorMsg);
+            toast.error(errorMsg);
             return false;
         }
-        if (selectedPlaces.length === 0) {
-            setError("กรุณาเลือกหน่วยงานอย่างน้อย 1 แห่ง");
+        // Only require assignPlace for user role, admin can have empty assignPlace
+        if (formData.role === 'user' && selectedPlaces.length === 0) {
+            const errorMsg = "กรุณาเลือกหน่วยงานอย่างน้อย 1 แห่ง";
+            setError(errorMsg);
+            toast.error(errorMsg);
             return false;
         }
         return true;
@@ -110,7 +126,7 @@ export function useAccountForm() {
         try {
             const placeIds = selectedPlaces.map(place => place.id);
 
-            const result = await signUp({
+            const result = await createAccount({
                 username: formData.username.trim(),
                 password: formData.password,
                 role: formData.role,
@@ -123,13 +139,42 @@ export function useAccountForm() {
                 setFormData({ username: "", password: "", role: "" });
                 setSelectedPlaces([]);
 
+                // Store success notification in sessionStorage
+                sessionStorage.setItem('accountNotification', JSON.stringify({
+                    type: 'created',
+                    title: 'สร้างบัญชีผู้ใช้สำเร็จ',
+                    message: 'บัญชีผู้ใช้ถูกสร้างเรียบร้อยแล้ว',
+                    variant: 'success'
+                }));
+
                 // Navigate back after success
                 router.push('/listaccounts');
             } else {
-                setError(result.error || "เกิดข้อผิดพลาดในการสร้างบัญชี");
+                if (result.error === 'DUPLICATE_USERNAME') {
+                    // Handle duplicate username directly - set sessionStorage and show notification
+                    sessionStorage.setItem('accountNotification', JSON.stringify({
+                        type: 'duplicated',
+                        title: 'สร้างบัญชีผู้ใช้ไม่สำเร็จ',
+                        message: 'Username นี้มีอยู่ในระบบแล้ว',
+                        variant: 'warning'
+                    }));
+
+                    // Trigger a re-render by updating state to show the notification
+                    setTimeout(() => {
+                        window.dispatchEvent(new CustomEvent('accountNotificationUpdate'));
+                    }, 100);
+
+                    return;
+                }
+
+                const errorMsg = result.error || "เกิดข้อผิดพลาดในการสร้างบัญชี";
+                setError(errorMsg);
+                toast.error(errorMsg);
             }
         } catch (err: unknown) {
-            setError("เกิดข้อผิดพลาดในการสร้างบัญชี");
+            const errorMsg = "เกิดข้อผิดพลาดในการสร้างบัญชี";
+            setError(errorMsg);
+            toast.error(errorMsg);
             console.error("Account creation error:", err);
         } finally {
             setIsLoading(false);

@@ -10,7 +10,7 @@ export type ApiFetchOptions = Omit<RequestInit, 'headers' | 'credentials'> & {
 const API_BASE = (process.env.NEXT_PUBLIC_BACKEND_API_URL ?? 'http://localhost:3003').replace(/\/+$/, '');
 
 // Endpoints that don't need authentication
-const PUBLIC_ENDPOINTS = ['/auth/login', '/auth/signup', '/auth/refresh-token'];
+const PUBLIC_ENDPOINTS = ['/auth/login', '/auth/refresh-token'];
 
 // Token refresh state to prevent multiple concurrent refresh requests
 let isRefreshing = false;

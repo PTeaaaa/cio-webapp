@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Input from "../../form/input/InputField";
 import Label from "../../form/Label";
 import ComponentCard from '@/components/common/ComponentCard';
@@ -13,13 +13,18 @@ export default function AddNewAccount() {
         selectedPlaces,
         isLoading,
         error,
-        success,
         availablePlaces,
         handleInputChange,
         handlePlaceSelect,
         handlePlaceRemove,
         handleSubmit,
     } = useAccountForm();
+
+    const [showSuccessNotification, setShowSuccessNotification] = useState(false);
+
+    const handleNotificationClose = () => {
+        setShowSuccessNotification(false);
+    };
 
     return (
         <>
@@ -28,17 +33,16 @@ export default function AddNewAccount() {
                     <ComponentCard title="ลงทะเบียนบัญชีผู้ใช้" className="w-full">
 
                         {/* Error/Success Messages */}
-                        {error && (
-                            <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg">
-                                {error}
-                            </div>
-                        )}
+                        {/* {error && (
+                            toast.error(error)
+                        )} */}
 
-                        {success && (
-                            <div className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded-lg">
+                        {/* Don't need it anymore, reserve just in case */}
+                        {/* {success && (
+                            <div className="mb-4 mx-2 px-4 py-2 bg-green-300 border border-green-400 text-green-700 rounded-lg">
                                 {success}
                             </div>
-                        )}
+                        )} */}
 
                         <div className="gap-x-6 gap-y-6 px-2 grid grid-cols-1">
                             <div>
@@ -69,7 +73,7 @@ export default function AddNewAccount() {
                                     onChange={(e) => {
                                         handleInputChange('role', e.target.value);
                                     }}
-                                    className="w-full p-2.5 border rounded-lg bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-gray-500 dark:text-gray-400 text-sm"
+                                    className="w-full p-2.5 border rounded-lg bg-white dark:bg-gray-900 border-gray-400 dark:border-gray-700 text-gray-500 dark:text-gray-400 text-sm"
                                     required
                                 >
                                     <option value="">กรุณาเลือกประเภทของบัญชี</option>
@@ -79,7 +83,11 @@ export default function AddNewAccount() {
                             </div>
 
                             <div className="">
-                                <Label>หน่วยงานที่มอบหมาย<span className="text-red-500">{" *"}</span></Label>
+                                <Label>
+                                    หน่วยงานที่มอบหมาย
+                                    {formData.role === 'user' && <span className="text-red-500">{" *"}</span>}
+                                    {formData.role === 'admin' && <span className="text-red-500 text-sm ml-2">(ไม่จำเป็น - Admin มีสิทธิ์เข้าถึงทุกหน่วยงาน)</span>}
+                                </Label>
 
                                 {/* Display selected places */}
                                 {selectedPlaces.map((place, index) => (
@@ -141,8 +149,9 @@ export default function AddNewAccount() {
                                                 e.target.value = ""; // Reset dropdown
                                             }
                                         }}
-                                        className="w-full p-2.5 border rounded-lg bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-gray-500 dark:text-gray-400 text-sm"
-                                        required
+                                        className="w-full p-2.5 border rounded-lg bg-white dark:bg-gray-900 border-gray-400 dark:border-gray-700 text-gray-500 dark:text-gray-400 text-sm disabled:opacity-35 disabled:cursor-not-allowed"
+                                        required={formData.role === 'user'}
+                                        disabled={formData.role !== 'user' && formData.role == 'admin'}
                                     >
                                         <option value="">กรุณาเลือกหน่วยงาน</option>
                                         {places.map((place) => (
@@ -179,7 +188,7 @@ export default function AddNewAccount() {
                         </button>
                     </div>
                 </div>
-            </div>
+            </div >
         </>
     );
 }

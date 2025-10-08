@@ -22,6 +22,7 @@
   "type": "commonjs",
   "dependencies": {
     "concurrently": "^9.2.0",
+    "react-hot-toast": "^2.6.0",
     "swr": "^2.3.6"
   },
   "devDependencies": {

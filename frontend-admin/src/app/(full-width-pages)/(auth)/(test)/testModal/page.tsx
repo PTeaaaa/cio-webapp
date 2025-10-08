@@ -5,7 +5,7 @@ import FormInModal from "@/components/example/ModalExample/FormInModal";
 import ModalBasedAlerts from "@/components/example/ModalExample/ModalBasedAlerts";
 import VerticallyCenteredModal from "@/components/example/ModalExample/VerticallyCenteredModal";
 import { useState } from 'react';
-import TimeLimitModal from "@/components/ui/modal/TimeLimitModal";
+import TimeLimitModal from "@/components/ui/modal/NotificationModal";
 
 export default function TestLoadingPage() {
     const [isOpen, setIsOpen] = useState(false);
