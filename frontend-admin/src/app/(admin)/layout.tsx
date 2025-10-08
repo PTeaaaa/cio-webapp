@@ -7,6 +7,7 @@ import AppSidebar from "@/layout/AppSidebar";
 import Backdrop from "@/layout/Backdrop";
 import React from "react";
 import { AccountsProvider } from "@/contexts/AccountsContext";
+import { Toaster } from "react-hot-toast";
 
 export default function AdminLayout({
   children,
@@ -26,13 +27,14 @@ export default function AdminLayout({
     <>
       <AccountsProvider>
         <ProtectedRoute>
+          <Toaster position="top-center" reverseOrder={false} />
           <div className="min-h-screen xl:flex">
             {/* Sidebar and Backdrop */}
             <AppSidebar />
             <Backdrop />
             {/* Main Content Area */}
             <div
-              className={`flex-1 transition-all  duration-300 ease-in-out 
+              className={`flex-1 transition-all  duration-300 ease-in-out
               ${mainContentMargin}`}
             >
               {/* Header */}

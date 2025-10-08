@@ -2,6 +2,7 @@ import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import AddNewAccount from "@/components/addnew/account/AddNewAccount";
 import { Metadata } from "next";
 import React from "react";
+import AddAccountNotification from "@/components/PageComponents/addaccount/client/AddAccountNotification";
 
 export const metadata: Metadata = {
   title: "CIOSite - Edit",
@@ -18,6 +19,8 @@ export default function EditPage() {
           <AddNewAccount />
         </div>
       </div>
+
+      <AddAccountNotification />
     </div>
   );
 }

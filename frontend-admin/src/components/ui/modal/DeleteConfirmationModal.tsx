@@ -13,19 +13,6 @@ export default function DeleteConfirmationModal({ isOpen, onClose, onConfirm, re
     const [inputText, setInputText] = useState("");
     const [error, setError] = useState("");
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-
-        if (inputText.trim() === requiredText) {
-            setError("");
-            setInputText("");
-            onConfirm();
-            onClose();
-        } else {
-            setError("ข้อความไม่ถูกต้อง กรุณากรอกข้อความให้ตรงกัน");
-        }
-    };
-
     const handleClose = () => {
         setInputText("");
         setError("");
@@ -81,7 +68,7 @@ export default function DeleteConfirmationModal({ isOpen, onClose, onConfirm, re
                 </p>
                 <p className="font-semibold text-red-400 pt-3 select-none">" {requiredText} "</p>
 
-                <form onSubmit={handleSubmit} className="mt-7">
+                <div className="mt-7">
                     <input
                         type="text"
                         value={inputText}
@@ -104,13 +91,23 @@ export default function DeleteConfirmationModal({ isOpen, onClose, onConfirm, re
                             ยกเลิก
                         </button>
                         <button
-                            type="submit"
+                            type="button"
+                            onClick={() => {
+                                if (inputText.trim() === requiredText) {
+                                    setError("");
+                                    setInputText("");
+                                    onConfirm();
+                                    onClose();
+                                } else {
+                                    setError("ข้อความไม่ถูกต้อง กรุณากรอกข้อความให้ตรงกัน");
+                                }
+                            }}
                             className="px-4 py-3 text-sm font-medium text-white rounded-lg bg-error-500 shadow-theme-xs hover:bg-error-600"
                         >
                             ยืนยันการลบ
                         </button>
                     </div>
-                </form>
+                </div>
             </div>
         </Modal>
     );

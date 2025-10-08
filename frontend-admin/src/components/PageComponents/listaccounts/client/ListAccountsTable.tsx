@@ -7,8 +7,8 @@ import {
     TableCell,
     TableHeader,
     TableRow,
-} from "../../components/ui/table";
-import Badge from "../../components/ui/badge/Badge";
+} from "../../../ui/table";
+import Badge from "../../../ui/badge/Badge";
 import Image from "next/image";
 import Link from "next/link";
 import { getAllAccounts } from "@/services/accounts/accountAPI";

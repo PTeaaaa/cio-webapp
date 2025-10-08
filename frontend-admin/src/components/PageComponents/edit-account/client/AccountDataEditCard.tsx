@@ -1,10 +1,11 @@
-// ไฟล์: DataEditCard.tsx
+"use client";
+
 import React, { useState, useEffect } from "react";
-import { Modal } from "../../../components/ui/modal";
-import { ConfirmationCard } from "../../../components/ui/modal/ConfirmationModal";
-import Button from "../../../components/ui/button/Button";
-import Input from "../../../components/form/input/InputField";
-import Label from "../../../components/form/Label";
+import { Modal } from "../../../ui/modal";
+import { ConfirmationCard } from "../../../ui/modal/ConfirmationModal";
+import Button from "../../../ui/button/Button";
+import Input from "../../../form/input/InputField";
+import Label from "../../../form/Label";
 import { useAccountData } from "@/hooks/accountdataHook/useAccountData";
 import { useAccounts } from "@/contexts/AccountsContext";
 import { getAllPlaces } from "@/services/places/placesAPI";

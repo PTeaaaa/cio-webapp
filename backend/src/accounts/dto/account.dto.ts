@@ -1,6 +1,6 @@
-import { IsString, IsNotEmpty, MinLength, IsIn } from 'class-validator';
+import { IsString, IsNotEmpty, MinLength, IsIn, IsArray, ValidateIf } from 'class-validator';
 
-export class SignupDto {
+export class AccountDto {
   @IsString()
   @IsNotEmpty()
   @MinLength(3)
@@ -13,9 +13,11 @@ export class SignupDto {
 
   @IsString()
   @IsNotEmpty()
-  @IsIn(['admin', 'user', 'moderator'])
+  @IsIn(['admin', 'user'])
   role!: string;
 
+  @IsArray()
+  @ValidateIf((o) => o.assignPlace && o.assignPlace.length > 0)
   @IsString({ each: true })
   @IsNotEmpty({ each: true })
   assignPlace!: string[];

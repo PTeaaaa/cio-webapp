@@ -2,14 +2,15 @@
 
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { AccountForm, UpdateAccountPayload } from "@/types";
-import { getAllAccounts, createAccount, SignupPayload, getAccountById, updateAccount, deleteAccount as deleteAccountAPI } from '@/services/accounts/accountAPI';
+import { getAllAccounts, createAccount as createAccountAPI, NewAccountPayload, getAccountById, updateAccount, deleteAccount as deleteAccountAPI } from '@/services/accounts/accountAPI';
+import { useRouter } from 'next/navigation';
 
 interface AuthContextType {
     accounts: AccountForm[];
     accountsLoading: boolean;
     accountsError: string | null;
     refreshAccounts: () => Promise<void>;
-    signUp: (payload: SignupPayload) => Promise<{ success: boolean; error?: string }>;
+    createAccount: (payload: NewAccountPayload) => Promise<{ success: boolean; error?: string }>;
     getAccount: (id: string) => Promise<AccountForm | null>;
     updateAccountData: (id: string, payload: UpdateAccountPayload) => Promise<{ success: boolean; error?: string }>;
     deleteAccount: (id: string, onSuccess?: () => void) => Promise<{ success: boolean; error?: string }>;
@@ -28,6 +29,7 @@ export function AccountsProvider({ children }: { children: React.ReactNode }) {
     const [accounts, setAccounts] = useState<AccountForm[]>([]);
     const [accountsLoading, setAccountsLoading] = useState(true);
     const [accountsError, setAccountsError] = useState<string | null>(null);
+    const router = useRouter();
 
     useEffect(() => {
         const fetchAccounts = async () => {
@@ -101,10 +103,10 @@ export function AccountsProvider({ children }: { children: React.ReactNode }) {
         }
     };
 
-    const signUp = async (payload: SignupPayload): Promise<{ success: boolean; error?: string }> => {
+    const createAccount = async (payload: NewAccountPayload): Promise<{ success: boolean; error?: string }> => {
         try {
             setAccountsError(null);
-            const result = await createAccount(payload);
+            const result = await createAccountAPI(payload);
 
             // Automatically refresh accounts list after successful creation
             await refreshAccounts();
@@ -112,6 +114,12 @@ export function AccountsProvider({ children }: { children: React.ReactNode }) {
             return { success: true };
         } catch (err: any) {
             const errorMessage = err.message || "Failed to create account";
+
+            if (err.isDuplicateUsername || errorMessage.includes('Username already exists')) {
+                // Return error to be handled by the form component
+                return { success: false, error: 'DUPLICATE_USERNAME' };
+            }
+
             setAccountsError(errorMessage);
             return { success: false, error: errorMessage };
         }
@@ -146,7 +154,7 @@ export function AccountsProvider({ children }: { children: React.ReactNode }) {
         accountsLoading,
         accountsError,
         refreshAccounts,
-        signUp,
+        createAccount,
         getAccount,
         updateAccountData,
         deleteAccount

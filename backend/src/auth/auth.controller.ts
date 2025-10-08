@@ -5,7 +5,6 @@ import { Request } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '@/prisma/prisma.service';
 import { getSessionCookieOpts } from './session/session-cookie';
-import { SignupDto } from './dto/signup.dto';
 import { JwtGuard } from './guards/jwt.guard';
 
 @Controller('auth')
@@ -73,18 +72,6 @@ export class AuthController {
         res.clearCookie('sid', getSessionCookieOpts(this.configService));
 
         return { ok: true };
-    }
-
-    @Post('signup')
-    @HttpCode(HttpStatus.CREATED)
-    async signup(@Body(ValidationPipe) signupDto: SignupDto) {
-        const { username, password, role, assignPlace } = signupDto;
-        const user = await this.authService.signup(username, password, role, assignPlace);
-
-        return {
-            message: 'Account created successfully',
-            user,
-        };
     }
 
     @Get('session')

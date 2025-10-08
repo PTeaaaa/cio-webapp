@@ -1,31 +1,10 @@
-"use client";
-
 import ComponentCard from "@/components/common/ComponentCard";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
-import ListAccountTable from "@/components-my/tables/ListAccountsTable";
-import TimeLimitModal from "@/components/ui/modal/TimeLimitModal";
-import React, { useEffect, useState } from "react";
+import ListAccountTable from "@/components/PageComponents/listaccounts/client/ListAccountsTable";
+import ListAccountsNotification from "@/components/PageComponents/listaccounts/client/ListAccountsNotification";
 import { Plus } from "lucide-react";
-import { useSearchParams, useRouter } from "next/navigation";
 
 export default function ListPeople() {
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const [showSuccessNotification, setShowSuccessNotification] = useState(false);
-
-  useEffect(() => {
-    // Check if we have the deleted=success parameter
-    if (searchParams.get('deleted') === 'success') {
-      setShowSuccessNotification(true);
-    }
-  }, [searchParams]);
-
-  const handleNotificationClose = () => {
-    setShowSuccessNotification(false);
-    // Clean up the URL parameter
-    router.replace('/listaccounts');
-  };
-
   return (
     <>
       <PageBreadcrumb pageTitle="ข้อมูลของคุณ" />
@@ -44,15 +23,7 @@ export default function ListPeople() {
         </ComponentCard>
       </div>
 
-      <TimeLimitModal
-        isOpen={showSuccessNotification}
-        onClose={handleNotificationClose}
-        title="ลบข้อมูลสำเร็จ"
-        message="บัญชีผู้ใช้ถูกลบออกจากระบบแล้ว"
-        variant="success"
-        autoDismissTime={5000}
-        position="top"
-      />
+      <ListAccountsNotification />
     </>
   );
 }
