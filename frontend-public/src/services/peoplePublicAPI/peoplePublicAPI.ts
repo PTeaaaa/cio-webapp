@@ -33,14 +33,28 @@ export const getPersonByPersonId = async (personId: string): Promise<PersonForm 
     }
 };
 
-export const getPeopleByPlaceId = async (placeId: string, page?: number, limit?: number): Promise<PeopleResponse | null> => {
+export const getPeopleByPlaceId = async (
+    placeId: string,
+    page?: number,
+    limit?: number,
+    sortBy?: string,
+    sortOrder?: 'asc' | 'desc'
+): Promise<PeopleResponse | null> => {
 
     if (!placeId) {
         return null;
     }
 
     try {
-        const url = `${BACKEND_URL}/people/getpeoplebyplaceId-public/${placeId}?page=${page}&limit=${limit}`; // ตรวจสอบ URL นี้
+        let url = `${BACKEND_URL}/people/getpeoplebyplaceId-public/${placeId}?page=${page}&limit=${limit}`;
+
+        // Add sorting parameters if provided
+        if (sortBy) {
+            url += `&sortBy=${sortBy}`;
+        }
+        if (sortOrder) {
+            url += `&sortOrder=${sortOrder}`;
+        }
 
         const response = await fetch(url, {
             method: 'GET',

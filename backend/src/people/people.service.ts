@@ -4,6 +4,7 @@ import { SessionUser } from "@/auth/auth.service";
 import { CreatePersonDto } from './dto/create-person.dto';
 import { UpdatePersonDto } from './dto/update-person.dto';
 import { MinioService } from '@/minio/minio.service';
+import { PeopleSortBy } from './dto/get-people-by-place.dto';
 
 @Injectable()
 export class PeopleService {
@@ -27,16 +28,25 @@ export class PeopleService {
         return people;
     }
 
-    async getPeopleByPlaceIdPublic(placeId: string, page: number, limit: number) {
-
+    async getPeopleByPlaceIdPublic(
+        placeId: string,
+        page: number,
+        limit: number,
+        sortBy: PeopleSortBy = PeopleSortBy.YEAR,
+        sortOrder: 'asc' | 'desc' = 'desc'
+    ) {
         if (!placeId) {
-            throw new BadRequestException('Agency is required to query places.');
+            throw new BadRequestException('Place ID is required to query people.');
         }
 
         try {
             const skip = (page - 1) * limit;
 
-            const [places, total] = await this.prisma.$transaction([
+            // Build dynamic orderBy object based on sortBy and sortOrder
+            const orderBy: any = {};
+            orderBy[sortBy] = sortOrder;
+
+            const [people, total] = await this.prisma.$transaction([
                 this.prisma.person.findMany({
                     where: {
                         placements: {
@@ -45,9 +55,7 @@ export class PeopleService {
                             }
                         },
                     },
-                    orderBy: {
-                        year: 'desc',
-                    },
+                    orderBy: orderBy,
                     skip: skip,
                     take: limit,
                 }),
@@ -63,7 +71,7 @@ export class PeopleService {
             ]);
 
             return {
-                data: places,
+                data: people,
                 meta: {
                     total,
                     page,
@@ -74,10 +82,8 @@ export class PeopleService {
 
         } catch (error: unknown) {
             const errorMessage = error instanceof Error ? error.message : String(error);
-            throw new InternalServerErrorException(`Failed to fetch places by agency: ${errorMessage}`);
+            throw new InternalServerErrorException(`Failed to fetch people by place: ${errorMessage}`);
         }
-
-
     }
 
     async getPersonByPersonId(personId: string) {

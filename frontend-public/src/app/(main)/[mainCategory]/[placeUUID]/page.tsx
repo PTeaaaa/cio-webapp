@@ -9,6 +9,7 @@ import BreadcrumbUpdater from "@/helpercomponents/breadcrumbsupdater";
 import sidebarData from "@/mockData/Sidebardata.json";
 import NotFoundCard from '@/components/mycomponents/Card-OtherError';
 import OtherErrorCard from "@/components/mycomponents/Card-OtherError";
+import SortBy from "@/components/mycomponents/sortBy";
 
 interface PageProps {
   params: {
@@ -16,8 +17,10 @@ interface PageProps {
     placeUUID: string
   };
   searchParams?: {
-    page?: number;
-    limit?: number;
+    page?: string;
+    limit?: string;
+    sortBy?: string;
+    sortOrder?: string;
     mock?: string; // for testing purpose
   };
 }
@@ -29,6 +32,8 @@ export default async function PeopleListPage({ params, searchParams, }: PageProp
 
   const currentPage = Number(awaitQuery?.page) || 1;
   const limit = Number(awaitQuery?.limit) || 5;
+  const sortBy = awaitQuery?.sortBy || 'year';
+  const sortOrder = (awaitQuery?.sortOrder as 'asc' | 'desc') || 'desc';
   const { mainCategory, placeUUID } = awaitParams;
 
   // // ===== MSW Testing =====
@@ -59,7 +64,7 @@ export default async function PeopleListPage({ params, searchParams, }: PageProp
     }
 
     // --- Fetch to get people that relate to this place ---
-    peopleResponse = await getPeopleByPlaceId(placeUUID, currentPage, limit);
+    peopleResponse = await getPeopleByPlaceId(placeUUID, currentPage, limit, sortBy, sortOrder);
     if (!peopleResponse || !peopleResponse.data || peopleResponse.data.length === 0) {
       console.log(`No people found for place: ${placeUUID}`);
       return <NotFoundCard errorMessage={"ไม่พบข้อมูล"} />;
@@ -106,15 +111,29 @@ export default async function PeopleListPage({ params, searchParams, }: PageProp
       <div className="flex justify-center">
         <div className="h-fit bg-white rounded-2xl shadow-xl/30 font-prompt lg:p-10 w-[80%]">
           <div className="w-full p-9 md:p-9 lg:p-0 flex flex-col justify-start gap-4 md:gap-6">
-            <h1 className="text-xl md:text-2xl font-bold">{SubplaceName}</h1>
+            <h1 className="flex text-xl md:text-2xl font-bold">
+              {SubplaceName}
+              <div className="justify-end ml-auto">
+                <SortBy type="people" />
+              </div>
+            </h1>
             {peopleData.length > 0 ? (
               <ItemsList category={mainCategory} placeUUID={placeUUID} items={peopleData} />
             ) : (
-              <p>No items found for this category.</p>
+              <div className="flex flex-col items-center justify-center py-12">
+                <div className="text-gray-400 mb-4">
+                  <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">ไม่พบรายการ</h3>
+                <p className="text-gray-600 text-center">ขณะนี้ยังไม่มีรายการสำหรับ "{SubplaceName}"</p>
+              </div>
             )}
           </div>
         </div>
       </div>
+
       {peopleData.length > 0 && totalPages > 0 && (
         <div className="flex w-[91%] justify-end pt-[20px]">
           <Pagination
