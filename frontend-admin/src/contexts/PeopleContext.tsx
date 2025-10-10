@@ -7,7 +7,7 @@ import {
   updatePerson as apiUpdatePerson,
   deletePerson as apiDeletePerson
 } from '@/services/people/peopleAPI';
-import { Person, PersonForm, CreatePersonPayload, UpdatePersonPayload } from '@/types'; // นำเข้า Person และ Payload types
+import { Person, CreatePersonPayload, UpdatePersonPayload } from '@/types'; // นำเข้า Person และ Payload types
 
 interface PeopleContextType {
   people: Person[];
@@ -101,6 +101,13 @@ export function PeopleProvider({
       if (onSuccess) {
         onSuccess();
       }
+
+      sessionStorage.setItem('personNotification', JSON.stringify({
+        type: 'deleted',
+        title: 'ลบบัญชีผู้ใช้สำเร็จ',
+        message: 'บัญชีผู้ใช้ถูกลบออกจากระบบแล้ว',
+        variant: 'success'
+      }));
 
       // Delay state update to allow navigation to complete first
       // This prevents the edit page from trying to refetch the deleted person

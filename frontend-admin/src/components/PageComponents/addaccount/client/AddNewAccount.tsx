@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Input from "../../form/input/InputField";
-import Label from "../../form/Label";
+import Input from "../../../form/input/InputField";
+import Label from "../../../form/Label";
 import ComponentCard from '@/components/common/ComponentCard';
-import { useAccountForm } from '@/hooks/useAccountForm';
+import { useAccountForm } from '@/hooks/useAddAccount';
 
 export default function AddNewAccount() {
     const {
@@ -12,7 +12,6 @@ export default function AddNewAccount() {
         places,
         selectedPlaces,
         isLoading,
-        error,
         availablePlaces,
         handleInputChange,
         handlePlaceSelect,
@@ -31,18 +30,6 @@ export default function AddNewAccount() {
             <div className="flex flex-col items-center">
                 <div className="flex flex-col pb-7 lg:py-7 w-full lg:w-[70%]">
                     <ComponentCard title="ลงทะเบียนบัญชีผู้ใช้" className="w-full">
-
-                        {/* Error/Success Messages */}
-                        {/* {error && (
-                            toast.error(error)
-                        )} */}
-
-                        {/* Don't need it anymore, reserve just in case */}
-                        {/* {success && (
-                            <div className="mb-4 mx-2 px-4 py-2 bg-green-300 border border-green-400 text-green-700 rounded-lg">
-                                {success}
-                            </div>
-                        )} */}
 
                         <div className="gap-x-6 gap-y-6 px-2 grid grid-cols-1">
                             <div>

@@ -160,11 +160,7 @@ export default function ListAccountTable() {
                                     </TableCell>
 
                                     <TableCell className="px-4 py-3 text-gray-500 text-center text-theme-sm dark:text-gray-400">
-                                        <div className="flex -space-x-2">
-                                            <div className="dark:border-gray-900">
-                                                {order.modifiedBy}
-                                            </div>
-                                        </div>
+                                        {order.modifiedByAccount?.username || "ไม่มีข้อมูล"}
                                     </TableCell>
 
                                     <TableCell className="px-4 py-3 text-gray-500 text-center text-theme-sm dark:text-gray-400">

@@ -4,7 +4,7 @@ import WelcomeCard from "@/components-my/home/WelcomeCard";
 import UserCountCard from "@/components-my/user/UserCountCard";
 import TestFetchButton from "@/components/testPurpose";
 
-export const metadata: Metadata = { 
+export const metadata: Metadata = {
   title:
     "CIOSite - edit",
   description: "CIO site edit page for admin",
@@ -21,9 +21,9 @@ export default function Homepage() {
         <UserCountCard />
       </div>
 
-      <div className="col-span-1">
+      {/* <div className="col-span-1">
         <TestFetchButton />
-      </div>
+      </div> */}
     </div>
   );
 }

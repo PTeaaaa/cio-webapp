@@ -5,7 +5,7 @@ import { ConfirmationCard } from "../../../components/ui/modal/ConfirmationModal
 import Button from "../../../components/ui/button/Button";
 import Input from "../../../components/form/input/InputField";
 import Label from "../../../components/form/Label";
-import { usePlaceLogic } from "@/hooks/usePlaceLogic";
+import { usePlaceLogic } from "@/hooks/useEditPlace";
 
 export default function PlaceDataEditCard() {
     const {

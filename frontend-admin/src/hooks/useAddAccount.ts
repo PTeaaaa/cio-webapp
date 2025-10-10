@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { getSidebarItems } from '@/services/sidebars/sidebarAPI';
 import { useAccounts } from '@/contexts/AccountsContext';
 import { Place } from '@/types';
@@ -13,7 +13,8 @@ interface AccountFormData {
 
 export function useAccountForm() {
     const router = useRouter();
-    const { createAccount } = useAccounts();
+    const searchParams = useSearchParams();
+    const { createAccount, deleteAccount } = useAccounts();
 
     // Form state
     const [formData, setFormData] = useState<AccountFormData>({
@@ -148,6 +149,7 @@ export function useAccountForm() {
                 }));
 
                 // Navigate back after success
+                resetForm();
                 router.push('/listaccounts');
             } else {
                 if (result.error === 'DUPLICATE_USERNAME') {

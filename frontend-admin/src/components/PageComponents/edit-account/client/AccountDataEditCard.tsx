@@ -196,7 +196,7 @@ export default function AccountDataEditCard() {
                                     สร้างโดย
                                 </p>
                                 <p className="text-base font-medium text-gray-800 dark:text-white/90">
-                                    {originalData.createdBy || "ไม่มีข้อมูล"}
+                                    {originalData.createdByAccount?.username || "ไม่มีข้อมูล"}
                                 </p>
                             </div>
                         </div>
@@ -216,7 +216,7 @@ export default function AccountDataEditCard() {
                                     แก้ไขโดย
                                 </p>
                                 <p className="text-base font-medium text-gray-800 dark:text-white/90">
-                                    {originalData.modifiedBy || "ไม่มีข้อมูล"}
+                                    {originalData.modifiedByAccount?.username || "ไม่มีข้อมูล"}
                                 </p>
                             </div>
                         </div>
@@ -300,8 +300,9 @@ export default function AccountDataEditCard() {
                                     />
                                 </div>
 
+                                {/* Still doubted that, is account can change role or not? */}
                                 {/* Role */}
-                                <div>
+                                {/* <div>
                                     <Label htmlFor="role">บทบาท</Label>
                                     <select
                                         id="role"
@@ -312,9 +313,8 @@ export default function AccountDataEditCard() {
                                         <option value="">เลือกบทบาท</option>
                                         <option value="admin">ผู้ดูแลระบบ</option>
                                         <option value="user">ผู้ใช้ทั่วไป</option>
-                                        <option value="moderator">ผู้ดูแล</option>
                                     </select>
-                                </div>
+                                </div> */}
 
                                 {/* Account Status */}
                                 <div>

@@ -3,31 +3,14 @@
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import DataEditCard from "@/components-my/edit/place/PlaceDataEditCard";
 import React from "react";
-import { useSearchParams, useRouter } from "next/navigation";
 import DeleteConfirmationModal from "@/components/ui/modal/DeleteConfirmationModal";
 import { useModal } from "@/hooks/useModal";
-import { deletePlaceById } from "@/services/places/placesAPI";
+import { usePlaceForm } from "@/hooks/useAddPlace";
 
 export default function EditAccountPageContent() {
 
-    const searchParams = useSearchParams();
-    const router = useRouter();
-    const accountId = searchParams.get('id');
     const deleteModal = useModal();
-
-    const handleDelete = async () => {
-        if (!accountId) {
-            console.warn("[page: edit-account] handleDelete triggered without accountId");
-            return;
-        }
-        try {
-            await deletePlaceById(accountId);
-            // Navigate immediately when deletion succeeds
-            router.replace('/listplaces');
-        } catch (error) {
-            console.error("Failed to delete account:", { accountId, error });
-        }
-    };
+    const { handleDelete } = usePlaceForm();
 
     return (
         <div>
@@ -50,7 +33,7 @@ export default function EditAccountPageContent() {
                 isOpen={deleteModal.isOpen}
                 onClose={deleteModal.closeModal}
                 onConfirm={handleDelete}
-                requiredText="I want to delete this account data"
+                requiredText="I want to delete this place data"
             />
         </div>
     );

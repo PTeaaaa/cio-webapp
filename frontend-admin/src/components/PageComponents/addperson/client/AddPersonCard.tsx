@@ -1,171 +1,36 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useModal } from "../../hooks/useModal";
-import { useDropzone } from "react-dropzone";
-import { Modal } from "../ui/modal";
-import Button from "../ui/button/Button";
-import Input from "../form/input/InputField";
-import Label from "../form/Label";
+import React from "react";
+import { Modal } from "../../../ui/modal";
+import Button from "../../../ui/button/Button";
+import Input from "../../../form/input/InputField";
+import Label from "../../../form/Label";
 import ComponentCard from '@/components/common/ComponentCard';
-import { getSidebarItems } from "@/services/sidebars/sidebarAPI";
-import { createPerson } from "@/services/people/peopleAPI";
-import { CreatePersonPayload, PersonForm, Place } from "@/types";
-import { uploadPersonImage } from "@/services/upload/uploadAPI"; // นำเข้าฟังก์ชันอัปโหลดรูปภาพ
+import { useAddPerson } from "@/hooks/pageLogic/addperson/useAddPerson";
 
 export default function AddNewDataCard() {
-    const router = useRouter();
-    const [places, setPlaces] = useState<Place[]>([]);
-    const [isLoading, setIsLoading] = useState(false); // สถานะการโหลดสำหรับการสร้างบุคคล
-    const [error, setError] = useState<string | null>(null); // ข้อผิดพลาดสำหรับการสร้างบุคคล
+    const {
+        // State
+        places,
+        isLoading,
+        formData,
+        selectedFile,
+        uploadedImageUrl,
+        imageUploadLoading,
+        imageUploadError,
+        isUploadModalOpen,
 
-    // State สำหรับข้อมูลฟอร์มบุคคล
-    const [formData, setFormData] = useState<CreatePersonPayload>({
-        prefix: "",
-        name: "",
-        surname: "",
-        email: "",
-        phone: "",
-        position: "",
-        placeId: "",
-        department: "",
-        year: new Date().getFullYear(),
-    });
+        // Handlers
+        handleInputChange,
+        handleSave,
+        handleCancel,
+        handlePhotoSave,
+        handleModalClose,
 
-    // State สำหรับการอัปโหลดรูปภาพ
-    const [selectedFile, setSelectedFile] = useState<File | null>(null); // เก็บไฟล์ที่เลือกจาก Dropzone
-    const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null); // เก็บ URL รูปภาพที่อัปโหลดสำเร็จ (สำหรับแสดงใน Modal)
-    const [imageUploadLoading, setImageUploadLoading] = useState(false); // สถานะการโหลดของการอัปโหลดรูปภาพ
-    const [imageUploadError, setImageUploadError] = useState<string | null>(null); // ข้อผิดพลาดในการอัปโหลดรูปภาพ
-
-    // Modal สำหรับแจ้งเตือนการอัปโหลดรูปภาพ
-    const { isOpen: isUploadModalOpen, openModal: openUploadModal, closeModal: closeUploadModal } = useModal();
-
-    // useEffect สำหรับดึงข้อมูลสถานที่สำหรับ Dropdown
-    useEffect(() => {
-        const fetchPlaces = async () => {
-            try {
-                const availablePlaces = await getSidebarItems();
-                setPlaces(availablePlaces)
-            }
-            catch (err: unknown) { // ระบุ type เป็น unknown เพื่อความปลอดภัยของ Type
-                const errorMessage = err instanceof Error ? err.message : String(err);
-                console.error("Failed to fetch places for dropdown", errorMessage);
-                setError("ไม่สามารถโหลดหน่วยงานได้ กรุณาลองใหม่ภายหลัง");
-            }
-        };
-        fetchPlaces();
-    }, []);
-
-    // handleInputChange: จัดการการเปลี่ยนแปลงค่าใน Input fields
-    const handleInputChange = (field: keyof CreatePersonPayload, value: string | number) => {
-        setFormData(prev => ({
-            ...prev,
-            [field]: value
-        }));
-    };
-
-    // handleSave: จัดการการบันทึกข้อมูลบุคคลและการอัปโหลดรูปภาพ
-    const handleSave = async () => {
-        // ตรวจสอบข้อมูลที่จำเป็น
-        if (!formData.name || !formData.surname || !formData.email || !formData.placeId || !formData.year) {
-            alert("ข้อมูลที่จำเป็นยังถูกกรอกไม่ครบ กรุณากรอกข้อมูลที่จำเป็น"); // ควรเปลี่ยนเป็น Modal/Toast
-            return;
-        }
-
-        setIsLoading(true); // เริ่มสถานะโหลดสำหรับการสร้างบุคคล
-        setError(null); // เคลียร์ข้อผิดพลาดเก่า
-
-        let newPerson: PersonForm | null = null; // กำหนด Type เป็น PersonForm
-
-        try {
-            // 1. สร้างข้อมูลบุคคลใหม่
-            newPerson = await createPerson(formData); // createPerson ควรคืนค่า PersonForm ที่มี ID
-            alert("สร้างบุคคลสำเร็จ!"); // ควรเปลี่ยนเป็น Modal/Toast
-
-            // 2. หากมีไฟล์รูปภาพถูกเลือก ให้ทำการอัปโหลด
-            if (selectedFile && newPerson?.id) { // ตรวจสอบว่ามีไฟล์และได้ ID บุคคลแล้ว
-                setImageUploadLoading(true); // เริ่มสถานะโหลดสำหรับการอัปโหลดรูปภาพ
-                setImageUploadError(null); // เคลียร์ข้อผิดพลาดเก่า
-                try {
-                    // เรียกฟังก์ชันอัปโหลดรูปภาพไปยัง Backend
-                    const url = await uploadPersonImage(selectedFile, newPerson.id);
-                    setUploadedImageUrl(url); // เก็บ URL รูปภาพที่อัปโหลดสำเร็จ
-                    openUploadModal(); // เปิด Modal แจ้งเตือนเมื่ออัปโหลดรูปภาพสำเร็จ
-                } catch (imgErr: unknown) {
-                    const errorMessage = imgErr instanceof Error ? imgErr.message : String(imgErr);
-                    setImageUploadError(`อัปโหลดรูปภาพไม่สำเร็จ: ${errorMessage}`);
-                    console.error("Error uploading image:", errorMessage);
-                    alert(`อัปโหลดรูปภาพไม่สำเร็จ: ${errorMessage}`); // ควรเปลี่ยนเป็น Modal/Toast
-                } finally {
-                    setImageUploadLoading(false); // สิ้นสุดสถานะโหลดสำหรับการอัปโหลดรูปภาพ
-                }
-            } else {
-                // ถ้าไม่มีไฟล์รูปภาพ หรือไม่มี ID บุคคล (ไม่ควรเกิดขึ้นถ้า createPerson สำเร็จ)
-                // ก็ทำการนำทางไปยังหน้าต่อไปเลย
-                router.push(`/listpeople/${formData.placeId}`);
-            }
-
-        } catch (err: unknown) { // ระบุ type เป็น unknown เพื่อความปลอดภัยของ Type
-            const errorMessage = err instanceof Error ? err.message : String(err);
-            setError(`บันทึกข้อมูลไม่สำเร็จ: ${errorMessage}`);
-            console.error("Error saving person:", errorMessage);
-        } finally {
-            setIsLoading(false); // สิ้นสุดสถานะโหลดสำหรับการสร้างบุคคล
-            // การนำทางจะถูกจัดการใน handlePhotoSave/handleModalClose หรือใน else block ด้านบน
-        }
-    };
-
-    // handleCancel: จัดการการยกเลิก
-    const handleCancel = () => {
-        router.back();
-    };
-
-    // onDrop function: จัดการเมื่อผู้ใช้ลากและวางไฟล์ใน Dropzone
-    const onDrop = (acceptedFiles: File[]) => {
-        if (acceptedFiles.length > 0) {
-            const file = acceptedFiles[0];
-
-            // ตรวจสอบขนาดไฟล์ (จำกัดที่ 5MB)
-            const MAX_FILE_SIZE_MB = 5;
-            if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
-                alert(`ขนาดไฟล์ควรน้อยกว่า ${MAX_FILE_SIZE_MB}MB`); // ควรเปลี่ยนเป็น Modal/Toast
-                setSelectedFile(null); // เคลียร์ไฟล์ที่เลือก
-                setImageUploadError(`ขนาดไฟล์ใหญ่เกินไป (สูงสุด ${MAX_FILE_SIZE_MB}MB)`);
-                return;
-            }
-
-            setSelectedFile(file); // เก็บไฟล์ที่เลือกไว้ใน State
-            setUploadedImageUrl(null); // เคลียร์ URL เก่าถ้ามี
-            setImageUploadError(null); // เคลียร์ Error เก่าถ้ามี
-            console.log("File selected:", file.name);
-        }
-    };
-
-    // useDropzone hook สำหรับจัดการ Dropzone functionality
-    const { getRootProps, getInputProps, isDragActive } = useDropzone({
-        onDrop,
-        accept: {
-            "image/png": [],
-            "image/jpeg": [],
-            "image/jpg": [],
-            // "image/webp": [], // หากต้องการรองรับ webp ให้เปิดคอมเมนต์
-            // "image/svg+xml": [], // หากต้องการรองรับ svg ให้เปิดคอมเมนต์
-        },
-        maxFiles: 1, // อนุญาตให้อัปโหลดได้ทีละ 1 ไฟล์
-    });
-
-    // handlePhotoSave: จัดการเมื่อผู้ใช้กดปุ่ม "บันทึกรูปภาพ" ใน Modal (หลังจากอัปโหลดสำเร็จ)
-    const handlePhotoSave = () => {
-        closeUploadModal(); // ปิด Modal
-        router.push(`/listpeople/${formData.placeId}`); // นำทางไปยังหน้า listpeople
-    };
-
-    // handleModalClose: จัดการเมื่อผู้ใช้กดปุ่ม "เข้าใจแล้ว" หรือปิด Modal
-    const handleModalClose = () => {
-        closeUploadModal(); // ปิด Modal
-        router.push(`/listpeople/${formData.placeId}`); // นำทางไปยังหน้า listpeople
-    }
+        // Dropzone
+        getRootProps,
+        getInputProps,
+        isDragActive,
+    } = useAddPerson();
 
     return (
         <>
@@ -236,11 +101,8 @@ export default function AddNewDataCard() {
                                     const selectedPlace = places.find(place => place.id === selectedPlaceId);
 
                                     if (selectedPlace) {
-                                        setFormData(prev => ({
-                                            ...prev,
-                                            placeId: selectedPlace.id,
-                                            department: selectedPlace.name,
-                                        }));
+                                        handleInputChange('placeId', selectedPlace.id);
+                                        handleInputChange('department', selectedPlace.name);
                                     }
                                 }}
                                 className="w-full p-2.5 border rounded-lg bg-white dark:bg-gray-900 dark:border-gray-700 text-gray-400 dark:text-white/30 text-sm"
@@ -286,20 +148,20 @@ export default function AddNewDataCard() {
                         <input {...getInputProps()} />
 
                         <div className="dz-message flex flex-col items-center m-0!">
-                            {/* Icon Container หรือ Preview รูปภาพที่เลือก */}
+                            {/* Icon Container or Preview of selected image */}
                             <div className="mb-[22px] flex justify-center">
                                 <div className="flex h-[68px] w-[68px] items-center justify-center rounded-full bg-gray-200 text-gray-700 dark:bg-gray-800 dark:text-gray-400 overflow-hidden">
                                     {selectedFile ? (
-                                        // แสดงพรีวิวรูปภาพที่เลือก
+                                        // Show preview of selected image
                                         <img
                                             src={URL.createObjectURL(selectedFile)}
                                             alt="Selected Preview"
                                             className="h-full w-full object-cover"
-                                            // Revoke Object URL เมื่อรูปภาพโหลดเสร็จ เพื่อประหยัด Memory
+                                            // Revoke Object URL when image loads to save memory
                                             onLoad={(e) => URL.revokeObjectURL((e.target as HTMLImageElement).src)}
                                         />
                                     ) : (
-                                        // แสดงไอคอนอัปโหลดเดิม
+                                        // Show default upload icon
                                         <svg
                                             className="fill-current"
                                             width="29"
@@ -322,7 +184,7 @@ export default function AddNewDataCard() {
                                 {imageUploadLoading ? "กำลังอัปโหลด..." : (selectedFile ? selectedFile.name : (isDragActive ? "วางไฟล์ที่นี่" : "ลากและวางไฟล์ที่นี่"))}
                             </h4>
 
-                            {/* แสดงข้อผิดพลาดในการอัปโหลด */}
+                            {/* Show upload error */}
                             {imageUploadError && (
                                 <p className="text-red-500 text-sm mb-2">{imageUploadError}</p>
                             )}
@@ -338,7 +200,7 @@ export default function AddNewDataCard() {
                     </form>
                 </div>
 
-                {/* Modal สำหรับ Preview/แจ้งเตือนการอัปโหลด */}
+                {/* Modal for upload notification/preview */}
                 <Modal isOpen={isUploadModalOpen} onClose={handleModalClose} className="max-w-[700px] m-4">
                     <div className="no-scrollbar relative w-full max-w-[700px] overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-11">
                         <div className="px-2 pr-14">
@@ -376,7 +238,7 @@ export default function AddNewDataCard() {
                 <Button
                     variant="primary"
                     onClick={handleSave}
-                    disabled={isLoading || imageUploadLoading} // ปิดการใช้งานปุ่มขณะโหลด/อัปโหลด
+                    disabled={isLoading || imageUploadLoading}
                 >
                     {isLoading ? "กำลังบันทึก..." : "บันทึก"}
                 </Button>

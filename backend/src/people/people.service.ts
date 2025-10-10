@@ -15,6 +15,9 @@ export class PeopleService {
     async getPeopleByPlaceId(id: string) {
         const people = await this.prisma.person.findMany({
             where: { placeId: id },
+            orderBy: {
+                year: 'desc',
+            },
         });
 
         if (people.length === 0) {

@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from 'react';
-import { createPlaces, CreatePlaceData } from '@/services/places/placesAPI';
+import { createPlaces, CreatePlaceData, deletePlaceById } from '@/services/places/placesAPI';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 interface PlaceFormData {
     name: string;
@@ -13,17 +14,20 @@ export const usePlaceForm = () => {
         name: '',
         agency: ''
     });
-    
+
+    const searchParams = useSearchParams();
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
+    const router = useRouter();
+    const placeId = searchParams.get('id');
 
     const handleInputChange = (field: keyof PlaceFormData, value: string) => {
         setFormData(prev => ({
             ...prev,
             [field]: value
         }));
-        
+
         // Clear messages when user starts typing
         if (error) setError(null);
         if (success) setSuccess(null);
@@ -34,12 +38,12 @@ export const usePlaceForm = () => {
             setError('กรุณากรอกชื่อสถานที่');
             return false;
         }
-        
+
         if (!formData.agency.trim()) {
             setError('กรุณาเลือกหน่วยงานที่สังกัด');
             return false;
         }
-        
+
         return true;
     };
 
@@ -50,7 +54,7 @@ export const usePlaceForm = () => {
         });
         setError(null);
         setSuccess(null);
-        
+
         // Force reset the input field by clearing its value directly
         const nameInput = document.querySelector('input[placeholder="ชื่อสถานที่"]') as HTMLInputElement;
         if (nameInput) {
@@ -74,16 +78,45 @@ export const usePlaceForm = () => {
             }];
 
             const result = await createPlaces(placeData);
-            
+
             if (result) {
                 setSuccess(`เพิ่มสถานที่ "${formData.name}" สำเร็จแล้ว`);
                 resetForm();
+
+                sessionStorage.setItem('placeNotification', JSON.stringify({
+                    type: 'created',
+                    title: 'สร้างสถานที่สำเร็จ',
+                    message: 'สถานที่ถูกสร้างเรียบร้อยแล้ว',
+                    variant: 'success'
+                }));
+                router.push('/listplaces');
             }
         } catch (err) {
             const errorMessage = err instanceof Error ? err.message : 'เกิดข้อผิดพลาดในการเพิ่มสถานที่';
             setError(errorMessage);
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    const handleDelete = async () => {
+        if (!placeId) {
+            console.warn("[page: edit-account] handleDelete triggered without accountId");
+            return;
+        }
+        try {
+            await deletePlaceById(placeId);
+            // Navigate immediately when deletion succeeds
+            sessionStorage.setItem('placeNotification', JSON.stringify({
+                type: 'deleted',
+                title: 'ลบข้อมูลสถานที่สำเร็จ',
+                message: 'สถานที่ถูกลบออกจากระบบแล้ว',
+                variant: 'success'
+            }));
+
+            router.replace('/listplaces');
+        } catch (error) {
+            console.error("Failed to delete place:", { placeId, error });
         }
     };
 
@@ -94,6 +127,7 @@ export const usePlaceForm = () => {
         success,
         handleInputChange,
         handleSubmit,
-        resetForm
+        resetForm,
+        handleDelete
     };
 };

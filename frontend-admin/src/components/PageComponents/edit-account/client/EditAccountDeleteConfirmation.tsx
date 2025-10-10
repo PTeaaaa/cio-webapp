@@ -1,39 +1,24 @@
 "use client";
 
 import React from "react";
-import { useSearchParams, useRouter } from "next/navigation";
-import { useAccounts } from "@/contexts/AccountsContext";
 import DeleteConfirmationModal from "@/components/ui/modal/DeleteConfirmationModal";
 import { useModal } from "@/hooks/useModal";
+import { useAccounts } from "@/contexts/AccountsContext";
+import { useSearchParams } from "next/navigation";
 
 export default function EditAccountDeleteConfirmation() {
-    const searchParams = useSearchParams();
-    const router = useRouter();
-    const accountId = searchParams.get('id');
+
     const { deleteAccount } = useAccounts();
+    const searchParams = useSearchParams();
+    const accountId = searchParams.get('id');
     const deleteModal = useModal();
 
     const handleDelete = async () => {
         if (!accountId) {
-            console.warn("[page: edit-account] handleDelete triggered without accountId");
+            console.warn("[EditAccountDeleteConfirmation] handleDelete triggered without accountId");
             return;
         }
-        try {
-            await deleteAccount(accountId, () => {
-                // Store success notification in sessionStorage
-                sessionStorage.setItem('accountNotification', JSON.stringify({
-                    type: 'deleted',
-                    title: 'ลบข้อมูลสำเร็จ',
-                    message: 'บัญชีผู้ใช้ถูกลบออกจากระบบแล้ว',
-                    variant: 'success'
-                }));
-
-                // Navigate immediately to listaccounts
-                router.replace('/listaccounts');
-            });
-        } catch (error) {
-            console.error("Failed to delete account:", { accountId, error });
-        }
+        await deleteAccount(accountId);
     };
 
     return (

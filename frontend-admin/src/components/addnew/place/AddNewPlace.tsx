@@ -4,7 +4,7 @@ import React from "react";
 import Input from "@/components/form/input/InputField";
 import Label from "@/components/form/Label";
 import ComponentCard from '@/components/common/ComponentCard';
-import { usePlaceForm } from '@/hooks/usePlaceForm';
+import { usePlaceForm } from '@/hooks/useAddPlace';
 
 export default function AddNewPlace() {
     const {

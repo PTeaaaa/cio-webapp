@@ -14,7 +14,7 @@ export class AccountsService {
 
     constructor(private readonly prisma: PrismaService) { }
 
-    async createAccount(username: string, password: string, role: string, assignPlace: string[]) {
+    async createAccount(username: string, password: string, role: string, assignPlace: string[], createdById?: string) {
         // Validate input
         if (!username || username.trim().length < 3) {
             throw new BadRequestException('Username must be at least 3 characters long');
@@ -48,6 +48,7 @@ export class AccountsService {
                         username: username.trim(),
                         password: hashedPassword,
                         role,
+                        createdBy: createdById,
                     },
                 });
 
@@ -88,7 +89,7 @@ export class AccountsService {
         }
     }
 
-    async findAllAccounts(page: number, limit: number) {
+    async getAllAccounts(page: number, limit: number) {
         try {
             const skip = (page - 1) * limit;
 
@@ -103,6 +104,18 @@ export class AccountsService {
                         assignedPlaces: {
                             include: {
                                 place: true
+                            }
+                        },
+                        createdByAccount: {
+                            select: {
+                                id: true,
+                                username: true
+                            }
+                        },
+                        modifiedByAccount: {
+                            select: {
+                                id: true,
+                                username: true
                             }
                         }
                     }
@@ -135,6 +148,18 @@ export class AccountsService {
                         include: {
                             place: true
                         }
+                    },
+                    createdByAccount: {
+                        select: {
+                            id: true,
+                            username: true
+                        }
+                    },
+                    modifiedByAccount: {
+                        select: {
+                            id: true,
+                            username: true
+                        }
                     }
                 }
             });
@@ -153,7 +178,7 @@ export class AccountsService {
         }
     }
 
-    async updateAccount(id: string, updateData: UpdateAccountPayload) {
+    async updateAccount(id: string, updateData: UpdateAccountPayload, modifiedById?: string) {
         try {
             const existingAccount = await this.prisma.account.findUnique({
                 where: { id },
@@ -185,6 +210,7 @@ export class AccountsService {
                     where: { id },
                     data: {
                         ...accountData,
+                        modifiedBy: modifiedById,
                         updatedAt: new Date()
                     }
                 });
@@ -214,6 +240,18 @@ export class AccountsService {
                         assignedPlaces: {
                             include: {
                                 place: true
+                            }
+                        },
+                        createdByAccount: {
+                            select: {
+                                id: true,
+                                username: true
+                            }
+                        },
+                        modifiedByAccount: {
+                            select: {
+                                id: true,
+                                username: true
                             }
                         }
                     }
