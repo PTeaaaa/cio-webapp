@@ -1,8 +1,7 @@
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
-import AddNewAccount from "@/components/addnew/account/AddNewAccount";
+import AddNewDataCard from "@/components/PageComponents/addperson/client/AddPersonCard";
 import { Metadata } from "next";
 import React from "react";
-import AddAccountNotification from "@/components/PageComponents/addaccount/client/AddAccountNotification";
 
 export const metadata: Metadata = {
   title: "CIOSite - Edit",
@@ -10,17 +9,15 @@ export const metadata: Metadata = {
     "This is CIOSite editing page.",
 };
 
-export default function EditPage() {
+export default function AddPersonPage() {
   return (
     <div>
       <PageBreadcrumb pageTitle="เพิ่มข้อมูลใหม่" />
-      <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] lg:p-6 shadow-xl">
+      <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] lg:p-6">
         <div className="space-y-6">
-          <AddNewAccount />
+          <AddNewDataCard />
         </div>
       </div>
-
-      <AddAccountNotification />
     </div>
   );
 }

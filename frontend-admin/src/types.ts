@@ -60,8 +60,16 @@ export interface AccountForm {
     lastLoginAt: Date;
     passwordChangedAt?: Date;
     createdBy: string;
+    createdByAccount?: {
+        id: string;
+        username: string;
+    };
     createdAt: Date;
     modifiedBy: string;
+    modifiedByAccount?: {
+        id: string;
+        username: string;
+    };
     updatedAt: Date;
     isActive: boolean;
     assignedPlaces?: AccountPlace[];

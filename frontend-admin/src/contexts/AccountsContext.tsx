@@ -126,13 +126,29 @@ export function AccountsProvider({ children }: { children: React.ReactNode }) {
     };
 
     const deleteAccount = async (id: string, onSuccess?: () => void): Promise<{ success: boolean; error?: string }> => {
+        if (!id) {
+            console.warn("[AccountsContext] deleteAccount triggered without accountId");
+            return { success: false, error: "Account ID is required" };
+        }
+
         try {
             setAccountsError(null);
             await deleteAccountAPI(id);
 
-            // Call the success callback immediately (for navigation)
+            // Store success notification in sessionStorage
+            sessionStorage.setItem('accountNotification', JSON.stringify({
+                type: 'deleted',
+                title: 'ลบข้อมูลสำเร็จ',
+                message: 'บัญชีผู้ใช้ถูกลบออกจากระบบแล้ว',
+                variant: 'success'
+            }));
+
+            // Call the success callback if provided (for custom behavior)
             if (onSuccess) {
                 onSuccess();
+            } else {
+                // Default behavior: Navigate to listaccounts
+                router.replace('/listaccounts');
             }
 
             // Delay state update to allow navigation to complete first
@@ -145,6 +161,7 @@ export function AccountsProvider({ children }: { children: React.ReactNode }) {
         } catch (err: any) {
             const errorMessage = err.message || "Failed to delete account";
             setAccountsError(errorMessage);
+            console.error("Failed to delete account:", { accountId: id, error: err });
             return { success: false, error: errorMessage };
         }
     }

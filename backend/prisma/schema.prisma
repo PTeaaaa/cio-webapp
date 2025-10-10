@@ -34,17 +34,22 @@ model Account {
 
   // Security tracking
   lastLoginAt       DateTime?
-  loginAttemped     Int?
   lockedUntil       DateTime?
   passwordChangedAt DateTime?
   
   // Audit trail
   createdBy         String?
+  createdByAccount  Account?  @relation("AccountCreatedBy", fields: [createdBy], references: [id], onDelete: SetNull)
   modifiedBy        String?
+  modifiedByAccount Account?  @relation("AccountModifiedBy", fields: [modifiedBy], references: [id], onDelete: SetNull)
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt @default(now())
 
   assignedPlaces    AccountPlace[]
+  
+  // Self-referential relations for audit trail
+  accountsCreated   Account[] @relation("AccountCreatedBy")
+  accountsModified  Account[] @relation("AccountModifiedBy")
 
   @@map("accounts")
 }

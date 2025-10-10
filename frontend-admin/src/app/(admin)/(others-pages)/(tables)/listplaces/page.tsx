@@ -1,8 +1,7 @@
-"use client";
-
 import ComponentCard from "@/components/common/ComponentCard";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import ListPlacesTable from "@/components-my/tables/ListPlacesTable";
+import ListPlacesNotification from "@/components/PageComponents/listplaces/client/ListPlaceNotification";
 import React from "react";
 import { Plus } from "lucide-react";
 
@@ -25,6 +24,8 @@ export default function ListPlaces() {
           </div>
         </ComponentCard>
       </div>
+
+      <ListPlacesNotification />
     </>
   );
 }

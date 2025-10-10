@@ -54,19 +54,19 @@ export default function ListPeopleTable() {
 
                                 <TableCell
                                     isHeader
-                                    className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                                    className="px-5 py-3 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400"
                                 >
                                     ปีที่ดำรงตำแหน่ง
                                 </TableCell>
                                 <TableCell
                                     isHeader
-                                    className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                                    className="px-5 py-3 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400"
                                 >
                                     ผู้จัดการข้อมูลล่าสุด
                                 </TableCell>
                                 <TableCell
                                     isHeader
-                                    className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                                    className="px-5 py-3 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400"
                                 >
                                     วันที่อัปเดตข้อมูลล่าสุด (วัน/เดือน/ปี)
                                 </TableCell>
@@ -135,11 +135,11 @@ export default function ListPeopleTable() {
                                         {order.placeId || "ไม่มีข้อมูล"}
                                     </TableCell> */}
 
-                                    <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                                    <TableCell className="px-4 py-3 text-gray-500 text-center text-theme-sm dark:text-gray-400">
                                         <Badge
                                             size="sm"
                                             color={
-                                                order.year === new Date().getFullYear()
+                                                order.year === new Date().getFullYear() + 543
                                                     ? "success" : "warning"
                                             }
                                         >
@@ -147,15 +147,13 @@ export default function ListPeopleTable() {
                                         </Badge>
                                     </TableCell>
 
-                                    <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                                        <div className="flex -space-x-2">
-                                            <div className="dark:border-gray-900">
-                                                ไม่มีข้อมูล
-                                            </div>
+                                    <TableCell className="px-4 py-3 text-gray-500 text-center text-theme-sm dark:text-gray-400">
+                                        <div className="dark:border-gray-900">
+                                            ไม่มีข้อมูล
                                         </div>
                                     </TableCell>
 
-                                    <TableCell className="px-4 py-3 text-gray-500 text-theme-sm dark:text-gray-400">
+                                    <TableCell className="px-4 py-3 text-gray-500 text-theme-sm text-center dark:text-gray-400">
                                         {new Date(order.updatedAt).toLocaleDateString('th-TH')}
                                     </TableCell>
 

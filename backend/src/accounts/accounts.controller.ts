@@ -1,6 +1,13 @@
-import { Body, Controller, DefaultValuePipe, Param, ParseIntPipe, Query, Get, Put, Delete, Post, HttpCode, HttpStatus, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, DefaultValuePipe, Param, ParseIntPipe, Query, Get, Put, Delete, Post, HttpCode, HttpStatus, ValidationPipe, UseGuards, Req } from '@nestjs/common';
+import { Request } from 'express';
 import { AccountsService, UpdateAccountPayload } from './accounts.service';
 import { AccountDto } from './dto/account.dto';
+import { JwtGuard } from '@/auth/guards/jwt.guard';
+import { SessionUser } from '@/auth/auth.service';
+
+interface RequestWithUser extends Request {
+    user: SessionUser;
+}
 
 @Controller('accounts')
 export class AccountsController {
@@ -12,7 +19,7 @@ export class AccountsController {
         @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
         @Query('limit', new DefaultValuePipe(99999), ParseIntPipe) limit: number = 99999,
     ) {
-        return this.accountsService.findAllAccounts(page, limit);
+        return this.accountsService.getAllAccounts(page, limit);
     }
 
     @Get(':id')
@@ -21,10 +28,20 @@ export class AccountsController {
     }
 
     @Post('create')
+    @UseGuards(JwtGuard)
     @HttpCode(HttpStatus.CREATED)
-    async create(@Body(ValidationPipe) accountDto: AccountDto) {
+    async create(
+        @Req() req: RequestWithUser,
+        @Body(ValidationPipe) accountDto: AccountDto
+    ) {
         const { username, password, role, assignPlace } = accountDto;
-        const user = await this.accountsService.createAccount(username, password, role, assignPlace);
+        const user = await this.accountsService.createAccount(
+            username,
+            password,
+            role,
+            assignPlace,
+            req.user.id
+        );
 
         return {
             message: 'Account created successfully',
@@ -33,11 +50,13 @@ export class AccountsController {
     }
 
     @Put(':id')
+    @UseGuards(JwtGuard)
     async updateAccount(
+        @Req() req: RequestWithUser,
         @Param('id') id: string,
         @Body() updateData: UpdateAccountPayload
     ) {
-        return this.accountsService.updateAccount(id, updateData);
+        return this.accountsService.updateAccount(id, updateData, req.user.id);
     }
 
     @Delete(':id')
