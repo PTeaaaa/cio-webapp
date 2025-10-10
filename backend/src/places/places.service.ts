@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException, BadRequestException, InternalServerErrorException, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { UpdatePlaceDto } from './dto/update-place.dto';
+import { PlaceSortBy } from './dto/get-places-by-agency.dto';
 
 @Injectable()
 export class PlacesService {
@@ -43,8 +44,13 @@ export class PlacesService {
         return place;
     }
 
-    async getPlacesByAgency(agency: string, page: number, limit: number) {
-
+    async getPlacesByAgency(
+        agency: string,
+        page: number,
+        limit: number,
+        sortBy: PlaceSortBy = PlaceSortBy.NUMBER_ORDER,
+        sortOrder: 'asc' | 'desc' = 'asc'
+    ) {
         if (!agency) {
             throw new BadRequestException('Agency is required to query places.');
         }
@@ -67,14 +73,16 @@ export class PlacesService {
                 throw new NotFoundException(`No places found for agency: ${agency}. Agency may not exist or has no places.`);
             }
 
+            // Build dynamic orderBy object based on sortBy and sortOrder
+            const orderBy: any = {};
+            orderBy[sortBy] = sortOrder;
+
             const [places, total] = await this.prisma.$transaction([
                 this.prisma.place.findMany({
                     where: {
                         agency: agency,
                     },
-                    orderBy: {
-                        numberOrder: 'asc',
-                    },
+                    orderBy: orderBy,
                     skip: skip,
                     take: limit,
                 }),

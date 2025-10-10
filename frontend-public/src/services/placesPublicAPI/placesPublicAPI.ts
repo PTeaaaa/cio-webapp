@@ -8,14 +8,23 @@ export type PlaceSearchResult = {
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_API_URL || 'http://localhost:3003';
 
-
 /**
  * ดึงข้อมูล Place ทั้งหมดที่ตรงกับ agency ที่ระบุ
  * ฟังก์ชันนี้ออกแบบมาสำหรับ Server Components (เช่น page.tsx)
  * @param agency ชื่อหน่วยงานที่ต้องการค้นหา
+ * @param page หน้าปัจจุบัน
+ * @param limit จำนวนรายการต่อหน้า
+ * @param sortBy ฟิลด์ที่ใช้เรียงลำดับ (name หรือ numberOrder)
+ * @param sortOrder ทิศทางการเรียง (asc หรือ desc)
  * @returns Promise ที่ resolve ด้วย Array ของ PlaceForm objects หรือ null หากไม่พบ
  */
-export const getPlacesByAgency = async (agency: string, page: number, limit: number): Promise<PlacesResponse> => {
+export const getPlacesByAgency = async (
+    agency: string,
+    page: number,
+    limit: number,
+    sortBy?: string,
+    sortOrder?: 'asc' | 'desc'
+): Promise<PlacesResponse> => {
     // หาก agency ไม่มีค่า, throw error
     if (!agency) {
         console.warn("getPlacesByAgency: agency is missing.");
@@ -23,7 +32,15 @@ export const getPlacesByAgency = async (agency: string, page: number, limit: num
     }
 
     try {
-        const url = `${BACKEND_URL}/places/by-agency/${agency}?page=${page}&limit=${limit}`;
+        let url = `${BACKEND_URL}/places/by-agency/${agency}?page=${page}&limit=${limit}`;
+
+        // Add sorting parameters if provided
+        if (sortBy) {
+            url += `&sortBy=${sortBy}`;
+        }
+        if (sortOrder) {
+            url += `&sortOrder=${sortOrder}`;
+        }
 
         const response = await fetch(url, {
             method: 'GET',

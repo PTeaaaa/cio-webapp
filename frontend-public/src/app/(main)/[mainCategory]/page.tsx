@@ -7,6 +7,7 @@ import { PlacesResponse } from "@/types";
 import sidebarData from "@/mockData/Sidebardata.json";
 import BreadcrumbUpdater from "@/helpercomponents/breadcrumbsupdater";
 import OtherErrorCard from "@/components/mycomponents/Card-OtherError";
+import SortBy from "@/components/mycomponents/sortBy";
 import ClientLoader from './client-loader';
 
 interface PageProps {
@@ -14,6 +15,8 @@ interface PageProps {
     searchParams?: {
         page?: string;
         limit?: string;
+        sortBy?: string;
+        sortOrder?: string;
         mock?: string; // for testing purpose
     };
 }
@@ -25,6 +28,8 @@ export default async function SubPlaceSelectPage({ params, searchParams, }: Page
 
     const currentPage = Number(awaitQuery?.page) || 1;
     const limit = Number(awaitQuery?.limit) || 5;
+    const sortBy = awaitQuery?.sortBy || 'numberOrder';
+    const sortOrder = (awaitQuery?.sortOrder as 'asc' | 'desc') || 'asc';
     const agency = decodeURIComponent(awaitParams.mainCategory);
 
     // // ===== MSW Testing =====
@@ -44,7 +49,7 @@ export default async function SubPlaceSelectPage({ params, searchParams, }: Page
     let placesResponse: PlacesResponse;
 
     try {
-        placesResponse = await getPlacesByAgency(agency, currentPage, limit);
+        placesResponse = await getPlacesByAgency(agency, currentPage, limit, sortBy, sortOrder);
 
         // ตรวจสอบข้อมูลที่ได้รับ
         if (!placesResponse?.data) {
@@ -85,11 +90,18 @@ export default async function SubPlaceSelectPage({ params, searchParams, }: Page
 
     return (
         <div className="flex flex-col pt-[30px] pb-[90px]">
+
             <BreadcrumbUpdater breadcrumbItems={breadcrumbItems} />
+
             <div className="flex justify-center">
                 <div className="h-fit bg-white rounded-2xl shadow-xl/30 font-prompt lg:p-10 w-[80%]">
                     <div className="w-full p-9 md:p-9 lg:p-0 flex flex-col justify-start gap-4 md:gap-6">
-                        <h1 className="text-xl md:text-2xl font-bold">{MainplaceName}</h1>
+                        <h1 className="flex text-xl md:text-2xl font-bold">
+                            {MainplaceName}
+                            <div className="justify-end ml-auto">
+                                <SortBy />
+                            </div>
+                        </h1>
                         {placesData.length > 0 ? (
                             <ItemsList category={agency} items={placesData} />
                         ) : (
@@ -100,7 +112,7 @@ export default async function SubPlaceSelectPage({ params, searchParams, }: Page
                                     </svg>
                                 </div>
                                 <h3 className="text-lg font-medium text-gray-900 mb-2">ไม่พบรายการ</h3>
-                                <p className="text-gray-600 text-center">ขณะนี้ยังไม่มีสถานที่สำหรับหมวดหมู่ "{MainplaceName}"</p>
+                                <p className="text-gray-600 text-center">ขณะนี้ยังไม่มีรายการสำหรับ "{MainplaceName}"</p>
                             </div>
                         )}
                     </div>

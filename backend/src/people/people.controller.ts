@@ -10,6 +10,7 @@ import { Roles } from 'src/auth/decorators/roles.decorator';
 import { Role } from 'src/auth/enums/roles.enum';
 import { CreatePersonDto } from './dto/create-person.dto';
 import { UpdatePersonDto } from './dto/update-person.dto';
+import { PeopleSortBy } from './dto/get-people-by-place.dto';
 
 
 interface RequestWithuser extends Request {
@@ -41,10 +42,12 @@ export class PeopleController {
     @Get('getpeoplebyplaceId-public/:placeId')
     getPeopleByPlaceIdPublic(
         @Param('placeId', new ParseUUIDPipe()) placeId: string,
-        @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number = 5,
+        @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
         @Query('limit', new DefaultValuePipe(5), ParseIntPipe) limit: number = 5,
+        @Query('sortBy', new DefaultValuePipe(PeopleSortBy.YEAR)) sortBy: PeopleSortBy = PeopleSortBy.YEAR,
+        @Query('sortOrder', new DefaultValuePipe('desc')) sortOrder: 'asc' | 'desc' = 'desc',
     ) {
-        return this.peopleService.getPeopleByPlaceIdPublic(placeId, page, limit);
+        return this.peopleService.getPeopleByPlaceIdPublic(placeId, page, limit, sortBy, sortOrder);
     }
 
     @Get('getpersonbypersonId/:personId')
