@@ -14,9 +14,6 @@ This full-stack web application is designed to efficiently manage complex organi
   
 
 ## Tech Stack
-
-  
-
 **Frontend (Admin Dashboard):**
 
 - Framework: Next.js 14/15 (App Router)
@@ -80,6 +77,24 @@ This full-stack web application is designed to efficiently manage complex organi
 - Comprehensive system activity logging (Audit Trail) to monitor data changes.
 
 - Security tracking for login attempts to detect and prevent unauthorized access.
+
+
+### Project Structure
+
+```bash
+.
+├── backend/             # NestJS Backend API
+│   ├── prisma/          # Database Schema & Migrations
+│   ├── src/             # Source code (Accounts, Auth, People, Places, Search, etc.)
+│   └── scripts/         # Scripts for generating test sessions
+├── frontend-admin/      # Next.js Frontend (Admin Panel)
+│   ├── public/          # Static assets (images, icons)
+│   └── src/             # UI Components, Layouts, and Pages
+├── frontend-public/     # Next.js Frontend (Public Facing Site)
+│   ├── public/          # Static assets for public users
+│   └── src/             # UI Components and Public Pages
+└── docker-compose.yml   # Docker configuration for PostgreSQL & MinIO
+```
   
 
 ## Getting Started
